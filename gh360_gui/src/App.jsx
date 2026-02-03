@@ -5,6 +5,7 @@ function App() {
     <div className="text-orange-500">
       <Button variant="contained">Hello world</Button>
       <Button variant="outlined">Hallo</Button>
+      <Button variant="outlined">Heihei</Button>
     </div>
   );
 }
