@@ -58,14 +58,14 @@ async function main() {
     });
 
     // A list constaining all the names of the movable joints in the urdf
-    export const jointNames = ['shoulder_yaw', 'shoulder_roll', 'shoulder_pitch',
+    const jointNames = ['shoulder_yaw', 'shoulder_roll', 'shoulder_pitch',
                                 'upperarm_roll', 'elbow', 'forearm_roll', 'wrist_pitch'];
 
     /*
     A function for changing the angle of a named joint.
     See jointNames variable for a list of all the names of movable joints.
      */
-    export function moveJoint(jointName, angle) {
+    function moveJoint(jointName, angle) {
         robotObj.setJointValue( jointName, angle )
     }
 
