@@ -46,10 +46,28 @@ async function main() {
     loader.packages = {
         gh360: '.'
     };
+
+    // Variables later used to modify joint angles.
+    let robotObj;
+
     // fetches the urdf file to create the mesh of the robot.
     loader.load('./urdf/gh360.urdf', robot => {
         scene.add(robot);
+
+        robotObj = robot;
     });
+
+    // A list constaining all the names of the movable joints in the urdf
+    export const jointNames = ['shoulder_yaw', 'shoulder_roll', 'shoulder_pitch',
+                                'upperarm_roll', 'elbow', 'forearm_roll', 'wrist_pitch'];
+
+    /*
+    A function for changing the angle of a named joint.
+    See jointNames variable for a list of all the names of movable joints.
+     */
+    export function moveJoint(jointName, angle) {
+        robotObj.setJointValue( jointName, angle )
+    }
 
     // Ads lights on boths sides of the robot so neither side is too dark (ambientlight was ugly as the was no shadows).
     const light1 = new THREE.DirectionalLight(0xffffff, 1);
