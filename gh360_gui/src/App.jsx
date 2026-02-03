@@ -1,12 +1,16 @@
-import { Button } from "@mui/material";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Applayout from "./ui/Applayout";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
-    <div className="text-orange-500">
-      <Button variant="contained">Hello world</Button>
-      <Button variant="outlined">Hallo</Button>
-      <Button variant="outlined">Heihei</Button>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route element={<Applayout />}>
+          <Route index element={<Dashboard />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
   );
 }
 
