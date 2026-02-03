@@ -1,5 +1,9 @@
 function Dashboard() {
-  return <div>dashboard</div>;
+  return (
+    <div className="flex justify-center items-center h-full text-6xl text-foreground">
+      Dashboard
+    </div>
+  );
 }
 
 export default Dashboard;
