@@ -47,7 +47,7 @@ async function main() {
         gh360: '.'
     };
 
-    // Variables later used to modify joint angles.
+    // Variable used for accessing the robot object.
     let robotObj;
 
     // fetches the urdf file to create the mesh of the robot.
@@ -80,7 +80,7 @@ async function main() {
     // Camera control variable
     let isMouseDown = false;
 
-    // Mouse event handlers
+    // Mouse event handlers. When mouse button is down it allows for moving the camera around the model.
     canvas.addEventListener('mousedown', (event) => {
         if (event.button === 0) { // Left mouse button
             isMouseDown = true;
