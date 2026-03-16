@@ -24,7 +24,7 @@
         <child link="shoulder0"/>
         <!-- <limit effort="1000.0" lower="-1.571" upper="1.571" velocity="0.5"/>-->
         <!-- <origin rpy="1.571 0 1.571" xyz="-0.66 0.0 1.242"/>  -->
-        <origin rpy="0 1.571 1.571" xyz="0 0.0 0"/>
+        <origin rpy="0 1.571 0" xyz="0 0.0 0"/>
     </joint>
 
     <link name="shoulder0">
@@ -112,7 +112,7 @@
     <joint name="upperarm_roll" type="revolute">
         <axis xyz="0 1 0"/>
         <limit effort="1000.0" lower="-3.0" upper="3.0" velocity="0.5"/>
-        <origin rpy="0 0 0" xyz="0.001 -0.107 -0.014"/>
+        <origin rpy="0 -1.5 0" xyz="0.001 -0.107 -0.014"/>
         <parent link="upperarm0"/>
         <child link="upperarm1"/>
     </joint>
@@ -165,7 +165,7 @@
     <joint name="forearm_roll" type="revolute">
         <axis xyz="0 1 0"/>
         <limit effort="1000.0" lower="-1.571" upper="1.571" velocity="0.5"/>
-        <origin rpy="0 0 0" xyz="0.000 -0.074 -0.041"/>
+        <origin rpy="1.5 0 0" xyz="0.000 -0.074 -0.041"/>
         <parent link="lowerarm0"/>
         <child link="lowerarm1"/>
     </joint>
@@ -183,7 +183,7 @@
     <joint name="wrist_pitch" type="revolute">
         <axis xyz="-1 0 0"/>
         <limit effort="1000.0" lower="-1.571" upper="1.571" velocity="0.5"/>
-        <origin rpy="0 0 0" xyz="0.0 -0.169 0.0"/>
+        <origin rpy="0 3.125 0" xyz="0.0 -0.169 0.0"/>
         <parent link="lowerarm1"/>
         <child link="lowerarm2"/>
     </joint>
@@ -202,7 +202,7 @@
         <parent link="lowerarm2"/>
         <child link="hook"/>
         <!-- <limit effort="1000.0" lower="-1.571" upper="1.571" velocity="0.5"/>-->
-        <origin rpy="3.1415 1.5708 0" xyz="0.00 -0.037 -0.001"/> 
+        <origin rpy="3.1415 1.5708 0" xyz="0.00 -0.037 -0.001"/>
     </joint>
 
     <link name="hook">

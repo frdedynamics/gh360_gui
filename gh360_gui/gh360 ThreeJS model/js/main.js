@@ -15,8 +15,8 @@ async function main() {
     let theta = 0; // Angle for rotation around the robot.
     let phi = 0; // Angle for vertical positioning.
 
-    camera.position.set(0, 0.25, robotDistance);
-    camera.lookAt(0, 0.25, 0);
+    camera.position.set(0.5, 0, robotDistance);
+    camera.lookAt(0.25, 0, 0);
 
     // Sets up a canvas to use for eventlisteners needed for camera logic.
     const canvas = document.createElement('canvas');
@@ -103,11 +103,11 @@ async function main() {
         phi -= deltaMove.x * 0.005;   // Rotate around X axis
 
         // Update camera position based on spherical coordinates
-        camera.position.x = robotDistance * Math.sin(phi) * Math.cos(theta);
-        camera.position.y = robotDistance * Math.sin(phi) * Math.sin(theta) + 0.25;
+        camera.position.x = robotDistance * Math.sin(phi) * Math.cos(theta) + 0.5;
+        camera.position.y = robotDistance * Math.sin(phi) * Math.sin(theta);
         camera.position.z = robotDistance * Math.cos(phi);
 
-        camera.lookAt(0, 0.25, 0); // Make the camera look at the robot
+        camera.lookAt(0.25, 0, 0); // Make the camera look at the robot
     });
 
     function animate() {
