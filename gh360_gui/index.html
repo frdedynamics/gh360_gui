@@ -5,42 +5,9 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>gh360_gui</title>
-
-    <style>
-        /* bottom-right small square iframe */
-        .robotarm-iframe {
-            position: fixed;
-            right: 8px;
-            bottom: 8px;
-            width: 550px;        /* change to desired size */
-            height: 450px;       /* change to desired size */
-            border: 1px solid rgba(0,0,0,0.1);
-            border-radius: 6px;
-            overflow: hidden;
-        }
-
-        /* optional: make iframe content scale or fit (if needed) */
-        .robotarm-iframe iframe {
-            width: 100%;
-            height: 100%;
-            display: block;
-            border: 0;
-            overflow: hidden;
-        }
-    </style>
 </head>
 <body>
 <div id="root"></div>
 <script type="module" src="./src/main.jsx"></script>
-
-<!-- Embed the robotarm page as a bottom-right square -->
-<div class="robotarm-iframe" aria-hidden="false" title="Robot arm model">
-    <iframe
-            src="./gh360%20ThreeJS%20model/Model%20robotarm.html"
-            title="Robot arm model"
-            loading="lazy"
-            sandbox="allow-scripts allow-same-origin"
-    ></iframe>
-</div>
 </body>
 </html>

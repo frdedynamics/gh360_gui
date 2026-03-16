@@ -66,8 +66,22 @@ async function main() {
     See jointNames variable for a list of all the names of movable joints.
      */
     function moveJoint(jointName, angle) {
-        robotObj.setJointValue( jointName, angle )
+        robotObj.setJointValue( jointName, angle );
     }
+
+    /*
+    A function for getting the current angle of a given joint in radians.
+     */
+    function getJoint(jointName) {
+        return robotObj.joints[jointName].jointValue;
+    }
+
+    window.moveJoint = function (jointName, angle) {
+        return moveJoint(jointName, angle);
+    };
+    window.getJoint = function (jointName) {
+        return getJoint(jointName);
+    };
 
     // Ads lights on boths sides of the robot so neither side is too dark (ambientlight was ugly as the was no shadows).
     const light1 = new THREE.DirectionalLight(0xffffff, 1);
