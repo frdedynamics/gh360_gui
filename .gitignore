@@ -1,2 +1,3 @@
 /.vs
 gh360_gui/package-lock.json
+/node_modules
