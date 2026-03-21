@@ -10,7 +10,6 @@ const useTopics = (topicName, messageType, throttleRate = 100) => {
   const [message, setMessage] = useState(null);
 
   useEffect(() => {
-    console.log("ros is here? ", ros);
     //If there is no ros, return immediately
     if (!ros) return;
 
