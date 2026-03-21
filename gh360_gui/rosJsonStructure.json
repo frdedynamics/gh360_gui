@@ -1,0 +1,156 @@
+//exmaple of a json object from the robot joints
+
+{
+  "header": {
+    "stamp": {
+      "sec": 0,
+      "nanosec": 0
+    },
+    "frame_id": ""
+  },
+  "name": [
+    "shoulder_yaw",
+    "shoulder_roll",
+    "shoulder_pitch",
+    "upperarm_roll",
+    "elbow",
+    "forearm_roll",
+    "wrist_pitch"
+  ],
+  "position": [
+    -0.41144167205810556, -0.07300971069335938, -0.009808729553222664,
+    0.8059710357666015, 1.6508690298461914, 0.13192969416837208,
+    0.46146640197753896
+  ],
+  "velocity": [
+    -0.059495515837817634, 0.01504280160911312, 0.0006664251016557344,
+    0.0010281984742704184, 0.44981220329209676, -0.04796176,
+    -0.045903545886977815
+  ],
+  "effort": []
+}
+
+
+
+//motor json format
+{
+  "motors": [
+    {
+      "motor_id": 1,
+      "present_position": -1.2778059963087391,
+      "present_velocity": 0,
+      "present_current": 50.4,
+      "present_temperature": 33,
+      "safety_check": true,
+      "moving": false
+    },
+    {
+      "motor_id": 2,
+      "present_position": -1.290077842611825,
+      "present_velocity": 0,
+      "present_current": 110.88,
+      "present_temperature": 32,
+      "safety_check": true,
+      "moving": false
+    },
+    {
+      "motor_id": 3,
+      "present_position": -0.65807775800294,
+      "present_velocity": 0.02398088,
+      "present_current": 97.44,
+      "present_temperature": 35,
+      "safety_check": true,
+      "moving": true
+    },
+    {
+      "motor_id": 4,
+      "present_position": -0.6596117387908257,
+      "present_velocity": 0.02398088,
+      "present_current": 3.36,
+      "present_temperature": 33,
+      "safety_check": true,
+      "moving": true
+    },
+    {
+      "motor_id": 5,
+      "present_position": 5.28457116067624,
+      "present_velocity": 0,
+      "present_current": 342.71999999999997,
+      "present_temperature": 35,
+      "safety_check": true,
+      "moving": false
+    },
+    {
+      "motor_id": 6,
+      "present_position": 5.313716795646068,
+      "present_velocity": 0,
+      "present_current": 396.47999999999996,
+      "present_temperature": 33,
+      "safety_check": true,
+      "moving": false
+    },
+    {
+      "motor_id": 7,
+      "present_position": 2.978990690073915,
+      "present_velocity": -0.04796176,
+      "present_current": -90.72,
+      "present_temperature": 33,
+      "safety_check": true,
+      "moving": true
+    },
+    {
+      "motor_id": 8,
+      "present_position": 2.969786805346601,
+      "present_velocity": -0.07194264,
+      "present_current": -67.2,
+      "present_temperature": 36,
+      "safety_check": true,
+      "moving": true
+    },
+    {
+      "motor_id": 10,
+      "present_position": 7.2097170494727205,
+      "present_velocity": 0,
+      "present_current": 141.12,
+      "present_temperature": 32,
+      "safety_check": true,
+      "moving": false
+    },
+    {
+      "motor_id": 9,
+      "present_position": 7.195911222381749,
+      "present_velocity": 0,
+      "present_current": 124.32,
+      "present_temperature": 36,
+      "safety_check": true,
+      "moving": false
+    },
+    {
+      "motor_id": 11,
+      "present_position": -0.3988276584400601,
+      "present_velocity": 0,
+      "present_current": 0,
+      "present_temperature": 35,
+      "safety_check": true,
+      "moving": false
+    },
+    {
+      "motor_id": 13,
+      "present_position": 0.6043884304269422,
+      "present_velocity": -0.19184704,
+      "present_current": 6.72,
+      "present_temperature": 35,
+      "safety_check": true,
+      "moving": true
+    },
+    {
+      "motor_id": 12,
+      "present_position": 0.5859806609723144,
+      "present_velocity": -0.16786616,
+      "present_current": -20.16,
+      "present_temperature": 34,
+      "safety_check": true,
+      "moving": true
+    }
+  ]
+}
