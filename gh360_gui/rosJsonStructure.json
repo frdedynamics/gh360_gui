@@ -32,9 +32,7 @@
 
 
 
-
-
-
+//motor json format
 {
   "motors": [
     {
