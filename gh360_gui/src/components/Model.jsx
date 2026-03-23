@@ -1,5 +1,7 @@
+import { Card } from "./ui/card";
+
 function Model() {
-  return <div>MODEL SECTION</div>;
+  return <Card className="w-full h-full bg-green-300">MODEL SECTION</Card>;
 }
 
 export default Model;

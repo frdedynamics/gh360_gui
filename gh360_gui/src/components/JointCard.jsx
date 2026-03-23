@@ -1,4 +1,3 @@
-import useTopics from "@/hooks/useTopics";
 import {
   Card,
   CardAction,
@@ -9,25 +8,17 @@ import {
 } from "./ui/card";
 import { Minus, Plus } from "lucide-react";
 import { useState } from "react";
+import useRosStore from "@/store/rosStore";
 
 function JointCard({ jointName, index, motors }) {
-  //subscribes to  a joint state topic using the custom hook
-  const jointMessage = useTopics(
-    "/gh360/joint_states",
-    "sensor_msgs/msg/JointState",
-  );
-
-  //subscribes to the motor topic using the cusstom hook
-
-  const motorMessage = useTopics(
-    "/gh360/motor_states_sorted",
-    "gh360_interfaces/msg/PortStatus",
-  );
+  //Using the zustand library to fetch from a single source of truth.
+  const jointMessage = useRosStore((state) => state.jointMessage);
+  const motorMessage = useRosStore((state) => state.motorMessage);
 
   const [moreInfo, setMoreInfo] = useState(false);
 
   return (
-    <Card className="w-full min-h-56 overflow-hidden">
+    <Card className="w-full min-h-20 overflow-hidden">
       <CardHeader className="text">
         <CardTitle>{jointName.replace("_", " ")}</CardTitle>
         <CardAction>
