@@ -27,7 +27,7 @@ function JointCard({ jointName, index, motors }) {
   const [moreInfo, setMoreInfo] = useState(false);
 
   return (
-    <Card className="w-full min-h-56 overflow-hidden">
+    <Card className="w-full min-h-20 overflow-hidden">
       <CardHeader className="text">
         <CardTitle>{jointName.replace("_", " ")}</CardTitle>
         <CardAction>
