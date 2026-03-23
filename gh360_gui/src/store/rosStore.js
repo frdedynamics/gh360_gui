@@ -8,6 +8,33 @@ const useRosStore = create((set, get) => ({
   ros: null,
   status: "disconnected", // connecting, connected, disconnect
 
+  //Initial topic states
+  jointMessage: null,
+  motorMessage: null,
+
+  //Function used to subscribe to different topics with a single source of truth
+  subscribeToTopics: () => {
+    const ros = get().ros;
+    if (!ros) return;
+
+    const jointTopic = new ROSLIB.Topic({
+      ros,
+      name: "/gh360/joint_states",
+      messageType: "sensor_msgs/msg/JointState",
+      throttle_rate: 100,
+    });
+
+    const motorTopic = new ROSLIB.Topic({
+      ros,
+      name: "/gh360/motor_states_sorted",
+      messageType: "gh360_interfaces/msg/PortStatus",
+      throttle_rate: 100,
+    });
+
+    jointTopic.subscribe((msg) => set({ jointMessage: msg }));
+    motorTopic.subscribe((msg) => set({ motorMessage: msg }));
+  },
+
   //Function used to start the connection to the rosbridge server
   connect: () => {
     const url = import.meta.env.VITE_ROSBRIDGE_SERVER || "ws://localhost:9090";
@@ -16,15 +43,30 @@ const useRosStore = create((set, get) => ({
 
     const ros = new ROSLIB.Ros({ url });
 
-    ros.on("connection", () => set({ status: "connected", ros }));
-    ros.on("error", () => set({ status: "error" }));
-    ros.on("close", () => set({ status: "close", ros: null }));
+    ros.on("connection", () => {
+      set({ status: "connected", ros });
+      get().subscribeToTopics();
+    });
+
+    ros.on("close", () =>
+      set({
+        status: "close",
+        ros: null,
+        jointMessage: null,
+        motorMessage: null,
+      }),
+    );
   },
 
   //Function to disconnect the connection.
   disconnect: () => {
     get().ros?.close();
-    set({ ros: null, status: "disconnected" });
+    set({
+      ros: null,
+      status: "disconnected",
+      motorMessage: null,
+      jointMessage: null,
+    });
   },
 }));
 
