@@ -18,7 +18,7 @@ function JointCard({ jointName, index, motors }) {
   const [moreInfo, setMoreInfo] = useState(false);
 
   return (
-    <Card className="w-full min-h-20 overflow-hidden">
+    <Card className="w-full h-full overflow-hidden ">
       <CardHeader className="text">
         <CardTitle>{jointName.replace("_", " ")}</CardTitle>
         <CardAction>
@@ -41,7 +41,9 @@ function JointCard({ jointName, index, motors }) {
           {!jointMessage ? (
             <p>Waiting for data...</p>
           ) : (
-            <p>Joint angle : {jointMessage.position[index].toFixed(3)} </p>
+            <p className="">
+              Joint angle : {jointMessage.position[index].toFixed(3)}{" "}
+            </p>
           )}
         </CardDescription>
       </CardHeader>
@@ -51,7 +53,7 @@ function JointCard({ jointName, index, motors }) {
         ) : (
           motors.map((motorIndex) => (
             <div key={motorIndex} className="mt-2">
-              <h2 className="font-semibold">Motor {motorIndex + 1}</h2>
+              <p className="font-semibold text-sm">Motor {motorIndex + 1}</p>
               <p className="ml-5">
                 Present position:{" "}
                 {motorMessage.motors[motorIndex].present_position.toFixed(3)}

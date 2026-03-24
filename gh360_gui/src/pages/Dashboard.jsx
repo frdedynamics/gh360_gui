@@ -6,12 +6,12 @@ import { JOINT_CONFIG } from "@/configs/jointConfigs";
 
 function Dashboard() {
   return (
-    <div className="grid grid-cols-[2fr_1fr] w-full ">
+    <div className="grid grid-cols-[2fr_1fr] w-full min-h-screen">
       {/* LEFT side of the dashboard */}
-      <div className="grid grid-cols-2 gap-4 items-start w-full p-4">
+      <div className="grid grid-cols-2 gap-2 items-stretch w-full p-4 h-full">
         {/* An info card for other things to display */}
         {/* !TODO */}
-        <Card className="min-h-20">
+        <Card className="min-h-20 w-full h-full">
           <CardHeader></CardHeader>
           <CardDescription></CardDescription>
         </Card>
