@@ -1,7 +1,12 @@
 import Camera from "@/components/Camera";
 import JointCard from "@/components/JointCard";
 import Model from "@/components/Model";
-import { Card, CardDescription, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { JOINT_CONFIG } from "@/configs/jointConfigs";
 
 function Dashboard() {
@@ -13,6 +18,7 @@ function Dashboard() {
         {/* !TODO */}
         <Card className="min-h-20 w-full h-full">
           <CardHeader></CardHeader>
+          <CardTitle></CardTitle>
           <CardDescription></CardDescription>
         </Card>
         {JOINT_CONFIG.map((joint) => (
