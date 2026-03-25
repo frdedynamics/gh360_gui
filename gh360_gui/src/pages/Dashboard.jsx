@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { JOINT_CONFIG } from "@/configs/jointConfigs";
+import { Bot } from "lucide-react";
 
 function Dashboard() {
   return (
