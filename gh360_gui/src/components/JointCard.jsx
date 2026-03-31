@@ -1,91 +1,71 @@
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "./ui/card";
-import { Minus, Plus } from "lucide-react";
-import { useState } from "react";
-import useRosStore from "@/store/rosStore";
+import { useRef, useState } from "react"
+import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card"
+import { Minus, Plus } from "lucide-react"
+import useRosTopic from "@/hooks/useRosTopics"
 
 function JointCard({ jointName, index, motors }) {
-  //Using the zustand library to fetch from a single source of truth.
-  const jointMessage = useRosStore((state) => state.jointMessage);
-  const motorMessage = useRosStore((state) => state.motorMessage);
+  const [jointAngle, setJointAngle] = useState(null)
+  const [motorData, setMotorData] = useState(null)
+  const [moreInfo, setMoreInfo] = useState(false)
 
-  const [moreInfo, setMoreInfo] = useState(false);
+  useRosTopic(
+    "/gh360/joint_states",
+    "sensor_msgs/msg/JointState",
+    100,
+    (msg) => setJointAngle(msg.position[index])
+  )
+
+  useRosTopic(
+    "/gh360/motor_states_sorted",
+    "gh360_interfaces/msg/PortStatus",
+    100,
+    (msg) => setMotorData(motors.map((i) => msg.motors[i]))
+  )
 
   return (
-    <Card className="w-full h-full overflow-hidden ">
-      <CardHeader className="text">
-        <CardTitle>{jointName.replace("_", " ")}</CardTitle>
+    <Card className="w-full h-full overflow-hidden flex flex-col">
+      <CardHeader className="text-lg shrink-0">
+        <CardTitle>{jointName.replaceAll("_", " ")}</CardTitle>
         <CardAction>
           <button
             className="cursor-pointer"
             onClick={() => setMoreInfo((prev) => !prev)}
           >
             {!moreInfo ? (
-              <Plus
-                className=" hover:rotate-90 hover:duration-300 bg-gray-200 rounded-2xl"
-                strokeWidth={2.5}
-              />
+              <Plus className="hover:rotate-90 hover:duration-300 bg-gray-200 rounded-2xl" strokeWidth={2.5} />
             ) : (
-              <Minus className=" bg-gray-200 rounded-2xl" strokeWidth={2.5} />
+              <Minus className="bg-gray-200 rounded-2xl" strokeWidth={2.5} />
             )}
           </button>
         </CardAction>
         <CardDescription>
-          {" "}
-          {!jointMessage ? (
+          {jointAngle === null ? (
             <p>Waiting for data...</p>
           ) : (
-            <p className="">
-              Joint angle : {jointMessage.position[index].toFixed(3)}{" "}
-            </p>
+            <p>Joint angle : {jointAngle.toFixed(3)}</p>
           )}
         </CardDescription>
       </CardHeader>
-      <CardContent className="overflow-y-auto ">
-        {!motorMessage ? (
+      <CardContent className="overflow-y-auto flex-1">
+        {!motorData ? (
           <p>Waiting...</p>
         ) : (
-          motors.map((motorIndex) => (
-            <div key={motorIndex} className="mt-2">
-              <p className="font-semibold text-sm">Motor {motorIndex + 1}</p>
-              <p className="ml-5">
-                Present position:{" "}
-                {motorMessage.motors[motorIndex].present_position.toFixed(3)}
-              </p>
-
-              <div>
-                {moreInfo ? (
-                  <div>
-                    {" "}
-                    <p className="ml-5">
-                      Present velocity:{" "}
-                      {motorMessage.motors[motorIndex].present_velocity.toFixed(
-                        3,
-                      )}
-                    </p>
-                    <p className="ml-5">
-                      Present current:{" "}
-                      {motorMessage.motors[motorIndex].present_current.toFixed(
-                        3,
-                      )}
-                    </p>
-                  </div>
-                ) : (
-                  ""
-                )}
-              </div>
+          motorData.map((motor, i) => (
+            <div key={motors[i]} className="mt-2">
+              <p className="font-semibold text-sm">Motor {motors[i] + 1}</p>
+              <p className="ml-5">Present position: {motor.present_position.toFixed(3)}</p>
+              {moreInfo && (
+                <div>
+                  <p className="ml-5">Present velocity: {motor.present_velocity.toFixed(3)}</p>
+                  <p className="ml-5">Present current: {motor.present_current.toFixed(3)}</p>
+                </div>
+              )}
             </div>
           ))
         )}
       </CardContent>
     </Card>
-  );
+  )
 }
 
-export default JointCard;
+export default JointCard

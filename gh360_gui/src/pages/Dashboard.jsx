@@ -36,10 +36,10 @@ function Dashboard() {
       {/* RIGHT SIDE OF THE DASHBOARD */}
       <aside className="flex flex-col min-h-screen w-full gap-2 p-2">
         <div className="flex-1 w-full">
-          <Camera />
+          <Model />
         </div>
         <div className="flex-1 w-full">
-          <Model />
+          <Camera />
         </div>
       </aside>
     </div>
