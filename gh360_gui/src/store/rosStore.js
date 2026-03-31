@@ -12,7 +12,10 @@ const useRosStore = create((set, get) => ({
   jointMessage: null,
   motorMessage: null,
 
-  //Function used to subscribe to different topics with a single source of truth
+  cameraMessage: null,
+  arucoMessage: null,
+
+  //Function used to subscribe to different topics
   subscribeToTopics: () => {
     const ros = get().ros;
     if (!ros) return;
@@ -31,6 +34,21 @@ const useRosStore = create((set, get) => ({
       throttle_rate: 100,
     });
 
+    const cameraTopic = new ROSLIB.Topic({
+      ros,
+      name: "/camera/color/image_raw",
+      messageType: "sensor_msgs/msg/Image",
+      throttle_rate: 100,
+    });
+
+    const arucoTopic = new ROSLIB.Topic({
+      ros,
+      name: "/door/aruco_markers",
+      messageType: "ros2_aruco_interfaces/msg/ArucoMarkers",
+      throttle_rate: 100,
+    });
+    cameraTopic.subscribe((msg) => set({ cameraMessage: msg }))
+    arucoTopic.subscribe((msg) => set({ arucoMessage: msg }))
     jointTopic.subscribe((msg) => set({ jointMessage: msg }));
     motorTopic.subscribe((msg) => set({ motorMessage: msg }));
   },
@@ -45,15 +63,18 @@ const useRosStore = create((set, get) => ({
 
     ros.on("connection", () => {
       set({ status: "connected", ros });
+      //The subscription to the different topics happends here after connection, so it ensures that we are connect before subscribing.
       get().subscribeToTopics();
     });
-
+    ros.on("error", () => set({ status: "error" }))
     ros.on("close", () =>
       set({
         status: "close",
         ros: null,
         jointMessage: null,
         motorMessage: null,
+        cameraMessage: null,
+        arucoMessage: null,
       }),
     );
   },
@@ -66,6 +87,8 @@ const useRosStore = create((set, get) => ({
       status: "disconnected",
       motorMessage: null,
       jointMessage: null,
+      arucoMessage: null,
+      cameraMessage: null,
     });
   },
 }));
