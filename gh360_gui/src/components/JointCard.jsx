@@ -45,37 +45,38 @@ function JointCard({ jointName, index, motors }) {
             )}
           </button>
         </CardAction>
-        <CardDescription>
-          {jointAngle === null ? (
-            <p>Waiting for data...</p>
-          ) : (
-            <p>Joint angle : {jointAngle.toFixed(3)}</p>
-          )}
-        </CardDescription>
       </CardHeader>
       <CardContent className="overflow-y-auto flex-1">
-        {!motorData ? (
-          <p>Waiting...</p>
+        {jointAngle === null ? (
+          <p>Waiting for data...</p>
         ) : (
-          motorData.map((motor, i) => (
-            <div key={motors[i]} className="mt-2">
-              <p className="font-semibold text-sm">Motor {motors[i] + 1}</p>
-              <p className="ml-5">
-                Present position: {motor.present_position.toFixed(3)}
-              </p>
-              {moreInfo && (
-                <div>
-                  <p className="ml-5">
-                    Present velocity: {motor.present_velocity.toFixed(3)}
-                  </p>
-                  <p className="ml-5">
-                    Present current: {motor.present_current.toFixed(3)}
-                  </p>
-                </div>
-              )}
+          <div className="gap-2 pt-2">
+            <div className="text-4xl">
+              {jointAngle.toFixed(3)}
+              <span className="opacity-50 text-2xl">rad</span>
             </div>
-          ))
+          </div>
         )}
+        {moreInfo
+          ? motorData.map((motor, i) => (
+              <div key={motors[i]} className="mt-2">
+                <p className="font-semibold text-sm">Motor {motors[i] + 1}</p>
+                <p className="ml-5">
+                  Present position: {motor.present_position.toFixed(3)}
+                </p>
+                {moreInfo && (
+                  <div>
+                    <p className="ml-5">
+                      Present velocity: {motor.present_velocity.toFixed(3)}
+                    </p>
+                    <p className="ml-5">
+                      Present current: {motor.present_current.toFixed(3)}
+                    </p>
+                  </div>
+                )}
+              </div>
+            ))
+          : ""}
       </CardContent>
     </Card>
   );
