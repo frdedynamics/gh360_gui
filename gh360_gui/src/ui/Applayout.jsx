@@ -1,6 +1,5 @@
 import { Outlet } from "react-router-dom";
 import Navbar from "./Sidenav";
-import Topbar from "./Topbar";
 
 function Applayout() {
   return (

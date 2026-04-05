@@ -8,18 +8,18 @@ const useRosStore = create((set, get) => ({
   status: "disconnected",
 
   connect: () => {
-    const url = import.meta.env.VITE_ROSBRIDGE_SERVER || "ws://localhost:9090"
-    set({ status: "connecting" })
-    const ros = new ROSLIB.Ros({ url })
+    const url = import.meta.env.VITE_ROSBRIDGE_SERVER || "ws://localhost:9090";
+    set({ status: "connecting" });
+    const ros = new ROSLIB.Ros({ url });
 
-    ros.on("connection", () => set({ status: "connected", ros }))
-    ros.on("error", () => set({ status: "error" }))
-    ros.on("close", () => set({ status: "disconnected", ros: null }))
+    ros.on("connection", () => set({ status: "connected", ros }));
+    ros.on("error", () => set({ status: "error" }));
+    ros.on("close", () => set({ status: "disconnected", ros: null }));
   },
 
   disconnect: () => {
-    get().ros?.close()
-    set({ ros: null, status: "disconnected" })
+    get().ros?.close();
+    set({ ros: null, status: "disconnected" });
   },
-}))
+}));
 export default useRosStore;
