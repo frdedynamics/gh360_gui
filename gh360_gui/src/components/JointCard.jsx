@@ -14,11 +14,15 @@ function JointCard({ jointName, index, motors }) {
   const [motorData, setMotorData] = useState(null);
   const [moreInfo, setMoreInfo] = useState(false);
 
-  useRosTopic("/gh360/joint_states", "sensor_msgs/msg/JointState", 100, (msg) =>
-    setJointAngle(msg.position[index]),
+  useRosTopic(
+    "/gh360/joint_states",
+    "sensor_msgs/msg/JointState",
+    100,
+    (msg) => {
+      setJointAngle(msg.position[index]);
+    },
   );
 
-  console.log(jointAngle);
   useRosTopic(
     "/gh360/motor_states_sorted",
     "gh360_interfaces/msg/PortStatus",

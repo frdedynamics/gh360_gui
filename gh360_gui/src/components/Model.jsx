@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card.jsx";
 import useRosStore from "@/store/rosStore.js";
 
-function Model() {
+function Model(setToggleCamera) {
   const modelFrame = useRef(null);
   const jointMessage = useRosStore((s) => s.jointMessage);
 

@@ -14,7 +14,7 @@ function App() {
 
   return (
     // Routing setup, with BrowserRouter.
-    <ThemeProvider defaultTheme="system" storageKey="vite-ui-theme">
+    <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <BrowserRouter>
         <Routes>
           {/* Applayout as parent component (sidebar + page) with <Outlet> as children component of the applayout */}
