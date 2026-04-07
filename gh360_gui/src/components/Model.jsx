@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card.jsx";
 import useRosStore from "@/store/rosStore.js";
 
-function Model(setToggleCamera) {
+function Model() {
   const modelFrame = useRef(null);
   const jointMessage = useRosStore((s) => s.jointMessage);
 
@@ -39,7 +39,7 @@ function Model(setToggleCamera) {
   }, [jointMessage]);
 
   return (
-    <div className="flex justify-center h-full text-foreground">
+    <div className="flex justify-center h-full text-foreground p-2">
       <Card className="w-full h-full p-0 overflow-hidden">
         <div className="robotarm-iframe w-full h-full min-h-0">
           <iframe
