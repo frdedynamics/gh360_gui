@@ -24,7 +24,7 @@ function JointCard({ jointName, index, motors }) {
   );
 
   return (
-    <Card className="w-full h-full flex flex-col overflow-hidden">
+    <Card className="w-full h-full flex flex-col overflow-hidden min-h-42">
       <CardHeader className="text-lg shrink-0">
         <CardTitle>{jointName.replaceAll("_", " ")}</CardTitle>
         <CardAction>

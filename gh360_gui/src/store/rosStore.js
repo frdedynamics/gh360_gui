@@ -2,18 +2,22 @@ import { create } from "zustand";
 import * as ROSLIB from "roslib";
 
 const useRosStore = create((set, get) => ({
-  // Connection state
   ros: null,
   status: "disconnected",
   intentionalDisconnect: false,
 
-  // Topic state
   jointMessage: null,
   motorMessage: null,
+
+  jointTopic: null,
+  motorTopic: null,
 
   subscribeToTopics: () => {
     const ros = get().ros;
     if (!ros) return;
+
+    // Prevent duplicate subscriptions
+    get().unsubscribeFromTopics();
 
     const jointTopic = new ROSLIB.Topic({
       ros,
@@ -31,11 +35,27 @@ const useRosStore = create((set, get) => ({
 
     jointTopic.subscribe((msg) => set({ jointMessage: msg }));
     motorTopic.subscribe((msg) => set({ motorMessage: msg }));
+
+    set({ jointTopic, motorTopic });
+  },
+
+  unsubscribeFromTopics: () => {
+    const { jointTopic, motorTopic } = get();
+
+    jointTopic?.unsubscribe();
+    motorTopic?.unsubscribe();
+
+    set({
+      jointTopic: null,
+      motorTopic: null,
+    });
   },
 
   connect: () => {
     const url = import.meta.env.VITE_ROSBRIDGE_SERVER || "ws://localhost:9090";
+
     set({ status: "connecting", intentionalDisconnect: false });
+
     const ros = new ROSLIB.Ros({ url });
 
     ros.on("connection", () => {
@@ -43,15 +63,20 @@ const useRosStore = create((set, get) => ({
       get().subscribeToTopics();
     });
 
-    ros.on("error", () => set({ status: "error" }));
+    ros.on("error", () => {
+      set({ status: "error" });
+    });
 
     ros.on("close", () => {
+      get().unsubscribeFromTopics();
+
       set({
         status: "disconnected",
         ros: null,
         jointMessage: null,
         motorMessage: null,
       });
+
       if (!get().intentionalDisconnect) {
         setTimeout(() => get().connect(), 2000);
       }
@@ -60,17 +85,28 @@ const useRosStore = create((set, get) => ({
 
   disconnect: () => {
     set({ intentionalDisconnect: true });
-    get().jointTopic?.unsubscribe();
-    get().motorTopic?.unsubscribe();
+
+    get().unsubscribeFromTopics();
     get().ros?.close();
-    set({
-      ros: null,
-      status: "disconnected",
-      jointMessage: null,
-      motorMessage: null,
-      jointTopic: null,
-      motorTopic: null,
-    });
+  },
+
+  reconnect: () => {
+    const ros = get().ros;
+
+    // force intentional disconnect
+    set({ intentionalDisconnect: true });
+
+    if (ros) {
+      get().unsubscribeFromTopics();
+
+      ros.once("close", () => {
+        get().connect();
+      });
+
+      ros.close();
+    } else {
+      get().connect();
+    }
   },
 }));
 
