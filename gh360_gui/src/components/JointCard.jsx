@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import {
   Card,
   CardAction,
@@ -7,31 +7,24 @@ import {
   CardTitle,
 } from "./ui/card";
 import { Minus, Plus } from "lucide-react";
-import useRosTopic from "@/hooks/useRosTopics";
+import useRosStore from "@/store/rosStore";
+import { useShallow } from "zustand/react/shallow";
 
 function JointCard({ jointName, index, motors }) {
-  const [jointAngle, setJointAngle] = useState(null);
-  const [motorData, setMotorData] = useState(null);
   const [moreInfo, setMoreInfo] = useState(false);
 
-  useRosTopic(
-    "/gh360/joint_states",
-    "sensor_msgs/msg/JointState",
-    100,
-    (msg) => {
-      setJointAngle(msg.position[index]);
-    },
+  const jointAngle = useRosStore(
+    (s) => s.jointMessage?.position[index] ?? null,
   );
 
-  useRosTopic(
-    "/gh360/motor_states_sorted",
-    "gh360_interfaces/msg/PortStatus",
-    100,
-    (msg) => setMotorData(motors.map((i) => msg.motors[i])),
+  const motorData = useRosStore(
+    useShallow((s) =>
+      s.motorMessage ? motors.map((i) => s.motorMessage.motors[i]) : null,
+    ),
   );
 
   return (
-    <Card className="w-full h-full flex flex-col overflow-hidden">
+    <Card className="w-full h-full flex flex-col overflow-hidden min-h-42">
       <CardHeader className="text-lg shrink-0">
         <CardTitle>{jointName.replaceAll("_", " ")}</CardTitle>
         <CardAction>
@@ -51,7 +44,6 @@ function JointCard({ jointName, index, motors }) {
           </button>
         </CardAction>
       </CardHeader>
-
       <CardContent className="flex-1 overflow-hidden">
         {jointAngle === null ? (
           <p>Waiting for data...</p>
@@ -63,7 +55,6 @@ function JointCard({ jointName, index, motors }) {
             </div>
           </div>
         )}
-
         {moreInfo &&
           motorData?.map((motor, i) => (
             <div key={motors[i]} className="mt-2 text-sm xl:text-base">
@@ -84,4 +75,4 @@ function JointCard({ jointName, index, motors }) {
   );
 }
 
-export default JointCard;
+export default memo(JointCard);

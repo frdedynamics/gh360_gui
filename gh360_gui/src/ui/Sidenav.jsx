@@ -11,16 +11,9 @@ import {
 import { useState } from "react";
 
 function Navbar() {
-  const { status, connect, disconnect } = useRosStore();
+  const { status, connect, disconnect, reconnect } = useRosStore();
   const isConnected = status === "connected";
   const [reconnectCooldown, setReconnectCooldown] = useState(false);
-
-  const handleReconnect = () => {
-    disconnect();
-    connect();
-    setReconnectCooldown(true);
-    setTimeout(() => setReconnectCooldown(false), 1000);
-  };
 
   const navbarOptions = [
     { icon: <LayoutDashboard />, name: "Dashboard" },
@@ -72,7 +65,11 @@ function Navbar() {
           <Button
             variant="outline"
             size="icon"
-            onClick={handleReconnect}
+            onClick={() => {
+              setReconnectCooldown(true);
+              reconnect();
+              setTimeout(() => setReconnectCooldown(false), 1000);
+            }}
             disabled={reconnectCooldown}
             title="Reconnect"
           >

@@ -6,7 +6,7 @@ import { VideoOff } from "lucide-react";
 function Camera({ toggleCamera, setToggleCamera }) {
   const canvasRef = useRef(null);
   const arucoRef = useRef(null);
-  const isActiveRef = useRef(true);
+  const isActiveRef = useRef(false);
 
   useEffect(() => {
     isActiveRef.current = toggleCamera;
