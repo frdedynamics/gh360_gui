@@ -10,7 +10,7 @@ import { Minus, Plus } from "lucide-react";
 import useRosStore from "@/store/rosStore";
 import { useShallow } from "zustand/react/shallow";
 
-function JointCard({ jointName, index, motors }) {
+function JointCard({ jointName, index, motors, angleUnit }) {
   const [moreInfo, setMoreInfo] = useState(false);
 
   const jointAngle = useRosStore(
@@ -24,7 +24,7 @@ function JointCard({ jointName, index, motors }) {
   );
 
   return (
-    <Card className="w-full h-full flex flex-col overflow-hidden min-h-42">
+    <Card className="w-full h-full flex flex-col overflow-hidden min-h-36">
       <CardHeader className="text-lg shrink-0">
         <CardTitle>{jointName.replaceAll("_", " ")}</CardTitle>
         <CardAction>
@@ -50,8 +50,9 @@ function JointCard({ jointName, index, motors }) {
         ) : (
           <div className="pt-2">
             <div className="text-3xl xl:text-4xl 2xl:text-5xl">
-              {jointAngle.toFixed(3)}
-              <span className="opacity-50 text-xl xl:text-2xl">rad</span>
+              {angleUnit==="radians"?
+              jointAngle.toFixed(3): (jointAngle * (180/Math.PI)).toFixed(3)}
+              <span className="opacity-50 text-xl xl:text-2xl">{angleUnit==="radians" ? <span>rad</span> : <span>deg</span> } </span>
             </div>
           </div>
         )}
