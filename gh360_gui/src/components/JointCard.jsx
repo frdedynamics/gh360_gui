@@ -11,6 +11,10 @@ import useRosStore from "@/store/rosStore";
 import { useShallow } from "zustand/react/shallow";
 
 function JointCard({ jointName, index, motors }) {
+  //Using the zustand library to fetch from a single source of truth.
+  const jointMessage = useRosStore((state) => state.jointMessage);
+  const motorMessage = useRosStore((state) => state.motorMessage);
+
   const [moreInfo, setMoreInfo] = useState(false);
 
   const jointAngle = useRosStore(
@@ -68,6 +72,27 @@ function JointCard({ jointName, index, motors }) {
               <p className="ml-3">
                 Current: {motor.present_current.toFixed(3)}
               </p>
+              <div>
+                {moreInfo ? (
+                  <div>
+                    {" "}
+                    <p className="ml-5">
+                      Present velocity:{" "}
+                      {motorMessage.motors[index].present_velocity.toFixed(
+                        3,
+                      )}
+                    </p>
+                    <p className="ml-5">
+                      Present current:{" "}
+                      {motorMessage.motors[index].present_current.toFixed(
+                        3,
+                      )}
+                    </p>
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
             </div>
           ))}
       </CardContent>

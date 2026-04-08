@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import URDFLoader from 'urdf-loader';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 /*
 You'll get a bunch of warnings saying functions are unresolved due to the library not being downloaded locally,
 however the program will still run in the browser.
@@ -10,13 +11,8 @@ async function main() {
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 150);
     scene.add(camera);
 
-    // Some variables for camera logic.
-    const robotDistance = 0.85; // Set a desired distance from the robot for the camera.
-    let theta = 0; // Angle for rotation around the robot.
-    let phi = 0; // Angle for vertical positioning.
-
-    camera.position.set(0.3, 0, robotDistance);
-    camera.lookAt(0.3, 0, 0);
+    camera.position.set(0.3, -0.2, 0.75);
+    camera.lookAt(0.3, -0.2, 0);
 
     // Sets up a canvas to use for eventlisteners needed for camera logic.
     const canvas = document.createElement('canvas');
@@ -32,6 +28,10 @@ async function main() {
         camera.updateProjectionMatrix();
         renderer.setSize(window.innerWidth, window.innerHeight);
     });
+
+    const controls = new OrbitControls( camera, renderer.domElement );
+    controls.target.set( 0.3, -0.1, 0 );
+    controls.update();
 
     const loader = new URDFLoader();
     loader.meshLoader = (geometry, done) => {
@@ -85,39 +85,6 @@ async function main() {
     light2.position.set(-1, -1, -1);
     scene.add(light1);
     scene.add(light2);
-
-    // Camera control variable
-    let isMouseDown = false;
-
-    // Mouse event handlers
-    canvas.addEventListener('mousedown', (event) => {
-        if (event.button === 0) { // Left mouse button
-            isMouseDown = true;
-        }
-    });
-
-    canvas.addEventListener('mouseup', () => {
-        isMouseDown = false;
-    });
-
-    canvas.addEventListener('mousemove', (event) => {
-        if (!isMouseDown) return;
-
-        const deltaMove = {
-            x: event.movementX,
-            y: event.movementY
-        };
-
-        theta -= deltaMove.y * 0.005; // Rotate around Y axis
-        phi -= deltaMove.x * 0.005;   // Rotate around X axis
-
-        // Update camera position based on spherical coordinates
-        camera.position.x = robotDistance * Math.sin(phi) * Math.cos(theta);
-        camera.position.y = robotDistance * Math.sin(phi) * Math.sin(theta) + 0.25;
-        camera.position.z = robotDistance * Math.cos(phi);
-
-        camera.lookAt(0.3, 0, 0); // Make the camera look at the robot
-    });
 
     function animate() {
         requestAnimationFrame(animate);
