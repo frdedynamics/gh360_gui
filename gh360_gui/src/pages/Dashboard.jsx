@@ -11,10 +11,13 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { DropdownMenu } from "@/components/ui/dropdown-menu";
 import { JOINT_CONFIG } from "@/configs/jointConfigs";
-import { useState } from "react";
+import { use, useState } from "react";
 
 function Dashboard() {
   const [toggleCamera, setToggleCamera] = useState(false);
+  const [angleUnit, setAngleUnit] = useState("radians");
+
+  console.log(angleUnit)
   return (
     <div className="grid grid-cols-[2fr_1fr] h-dvh w-full overflow-hidden">
       {/* LEFT —*/}
@@ -32,7 +35,18 @@ function Dashboard() {
                   onCheckedChange={(checked) => setToggleCamera(checked)}
                 />
               </p>
-              <p>Angle joints measured in</p>
+              <p>Angle joints measured in:</p>
+        
+              <label>
+                Radians  <input type="radio" name="angleUnit" value="radians"
+                checked ={angleUnit === "radians"}
+                onChange = {() => setAngleUnit("radians")}/>
+              </label>
+              
+               <label>
+               Degrees   <input type ="radio" name="angleUnit" value="degrees" checked={angleUnit==="degrees"}
+               onChange={() => setAngleUnit("degrees")} />
+              </label>
               <DropdownMenu />
             </CardContent>
           </Card>
@@ -43,6 +57,7 @@ function Dashboard() {
               jointName={joint.jointName}
               index={joint.index}
               motors={joint.motors}
+              angleUnit={angleUnit}
             />
           ))}
         </div>
