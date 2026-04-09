@@ -11,7 +11,7 @@ import {
 import { useState } from "react";
 
 function Navbar() {
-  const { status, connect, disconnect, reconnect } = useRosStore();
+  const { status, disconnect, reconnect } = useRosStore();
   const isConnected = status === "connected";
   const [reconnectCooldown, setReconnectCooldown] = useState(false);
 
@@ -23,7 +23,7 @@ function Navbar() {
 
   return (
     <nav className="flex flex-col h-full w-full ">
-      <div className="text-xl items-center justify-center font-semibold p-2 2xl:text-5xl">
+      <div className="text-xl items-center justify-center font-semibold p-2 2xl:text-5xl 2xl:p-6">
         GH360 Robot Arm
       </div>
       <div className="flex flex-col gap-5 mt-2">
@@ -41,7 +41,7 @@ function Navbar() {
       <div className="mt-auto flex flex-col gap-2 p-2 2xl:p-4 border-t-2 border-t-primary ">
         <div className="flex items-center gap-2 2xl:gap-4">
           {/* Status indicator */}
-          <div className="relative flex h-2 w-2 2xl:scale-150">
+          <div className="relative flex h-2 w-2 2xl:scale-200">
             <span
               className={`inline-flex h-full w-full rounded-full opacity-75 ${
                 isConnected ? "bg-green-400 animate-ping absolute " : ""
@@ -54,7 +54,7 @@ function Navbar() {
             />
           </div>
           <p
-            className={`capitalize text-sm font-medium 2xl:text-5xl ${
+            className={`capitalize text-sm font-medium 2xl:text-4xl ${
               isConnected ? "text-green-500" : "text-red-500"
             }`}
           >
@@ -63,7 +63,7 @@ function Navbar() {
 
           {/* Reconnect button */}
           <Button
-            className="2xl:size-12"
+            className="2xl:size-14"
             variant="outline"
             size="icon"
             onClick={() => {
@@ -82,7 +82,7 @@ function Navbar() {
 
           {/* Disconnect button */}
           <Button
-            className="2xl:size-12"
+            className="2xl:size-14"
             variant="outline"
             size="icon"
             onClick={() => disconnect()}
