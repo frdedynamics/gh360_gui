@@ -83,7 +83,7 @@ function Camera({ toggleCamera, setToggleCamera }) {
   return (
     <div className="flex flex-col w-full h-full">
       <div className="flex items-center justify-between p-2">
-        <p className="text-sm font-semibold">Camera Feed</p>
+        <p className="text-sm font-semibold 2xl:text-3xl">Camera Feed</p>
       </div>
 
       <canvas
@@ -96,8 +96,11 @@ function Camera({ toggleCamera, setToggleCamera }) {
       />
 
       {!toggleCamera && (
-        <div className="flex flex-1 items-center justify-center">
+        <div className="flex flex-1 items-center justify-center 2xl:scale-200 flex-col">
           <VideoOff size={88} />
+          <p className="text-muted-foreground">
+            Camera is currently turned off
+          </p>
         </div>
       )}
     </div>

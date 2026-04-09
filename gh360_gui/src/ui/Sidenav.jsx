@@ -22,14 +22,14 @@ function Navbar() {
   ];
 
   return (
-    <nav className="flex flex-col h-full w-full">
-      <div className="text-xl items-center justify-center font-semibold p-2">
+    <nav className="flex flex-col h-full w-full ">
+      <div className="text-xl items-center justify-center font-semibold p-2 2xl:text-5xl">
         GH360 Robot Arm
       </div>
       <div className="flex flex-col gap-5 mt-2">
         {navbarOptions.map((item) => (
           <button
-            className="flex gap-2 border-b-2 border-b-primary cursor-pointer hover:scale-105"
+            className="flex gap-2 border-b-2 border-b-primary cursor-pointer hover:scale-105 2xl:text-4xl 2xl:gap-6"
             key={item.name}
           >
             <div className="ml-2">{item.icon}</div>
@@ -38,10 +38,10 @@ function Navbar() {
         ))}
       </div>
 
-      <div className="mt-auto flex flex-col gap-2 p-2 border-t-2 border-t-primary">
+      <div className="mt-auto flex flex-col gap-2 p-2 border-t-2 border-t-primary ">
         <div className="flex items-center gap-2">
           {/* Status indicator */}
-          <div className="relative flex h-2 w-2">
+          <div className="relative flex h-2 w-2 2xl:scale-150">
             <span
               className={`inline-flex h-full w-full rounded-full opacity-75 ${
                 isConnected ? "bg-green-400 animate-ping absolute " : ""
@@ -54,7 +54,7 @@ function Navbar() {
             />
           </div>
           <p
-            className={`capitalize text-sm font-medium ${
+            className={`capitalize text-sm font-medium 2xl:text-5xl ${
               isConnected ? "text-green-500" : "text-red-500"
             }`}
           >
@@ -63,6 +63,7 @@ function Navbar() {
 
           {/* Reconnect button */}
           <Button
+            className="2xl:size-12"
             variant="outline"
             size="icon"
             onClick={() => {
@@ -75,22 +76,25 @@ function Navbar() {
           >
             <RefreshCw
               color="#32d17a"
-              className={reconnectCooldown ? "animate-spin" : ""}
+              className={`2xl:scale-200 ${reconnectCooldown ? "animate-spin" : ""}`}
             />
           </Button>
 
           {/* Disconnect button */}
           <Button
+            className="2xl:size-12"
             variant="outline"
             size="icon"
             onClick={() => disconnect()}
             disabled={!isConnected}
             title="Disconnect"
           >
-            <Power color="#e00b24" />
+            <Power color="#e00b24" className="2xl:scale-200" />
           </Button>
         </div>
-        <ModeToggle />
+        <div className="2xl:scale-150 2xl:origin-left p-2">
+          <ModeToggle className="2xl:size-12" />
+        </div>
       </div>
     </nav>
   );

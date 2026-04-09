@@ -25,9 +25,9 @@ function JointCard({ jointName, index, motors, angleUnit }) {
 
   return (
     <Card className="w-full h-full flex flex-col overflow-hidden min-h-36">
-      <CardHeader className="text-lg shrink-0">
+      <CardHeader className="text-lg shrink-0 xl:text-2xl 2xl:text-4xl">
         <CardTitle>{jointName.replaceAll("_", " ")}</CardTitle>
-        <CardAction>
+        <CardAction className="">
           <button
             className="cursor-pointer"
             onClick={() => setMoreInfo((prev) => !prev)}
@@ -49,16 +49,26 @@ function JointCard({ jointName, index, motors, angleUnit }) {
           <p>Waiting for data...</p>
         ) : (
           <div className="pt-2">
-            <div className="text-3xl xl:text-4xl 2xl:text-5xl">
-              {angleUnit==="radians"?
-              jointAngle.toFixed(3): (jointAngle * (180/Math.PI)).toFixed(3)}
-              <span className="opacity-50 text-xl xl:text-2xl">{angleUnit==="radians" ? <span>rad</span> : <span>deg</span> } </span>
+            <div className="text-3xl xl:text-4xl 2xl:text-9xl">
+              {angleUnit === "radians"
+                ? jointAngle.toFixed(3)
+                : (jointAngle * (180 / Math.PI)).toFixed(3)}
+              <span className="opacity-50 text-xl xl:text-2xl 2xl:text-8xl">
+                {angleUnit === "radians" ? (
+                  <span>rad</span>
+                ) : (
+                  <span>deg</span>
+                )}{" "}
+              </span>
             </div>
           </div>
         )}
         {moreInfo &&
           motorData?.map((motor, i) => (
-            <div key={motors[i]} className="mt-2 text-sm xl:text-base">
+            <div
+              key={motors[i]}
+              className="mt-2 text-sm xl:text-base 2xl:text-3xl 2xl:flex 2xl:flex-col"
+            >
               <p className="font-semibold">Motor {motors[i] + 1}</p>
               <p className="ml-3">
                 Position: {motor.present_position.toFixed(3)}

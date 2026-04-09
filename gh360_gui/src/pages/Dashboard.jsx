@@ -17,12 +17,12 @@ function Dashboard() {
   const [toggleCamera, setToggleCamera] = useState(false);
   const [angleUnit, setAngleUnit] = useState("radians");
 
-  console.log(angleUnit)
+  console.log(angleUnit);
   return (
     <div className="grid grid-cols-[2fr_1fr] h-dvh w-full overflow-hidden">
       {/* LEFT —*/}
       <div className="overflow-y-auto p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 2xl:text-4xl">
           <Card className="w-full">
             <CardHeader className="font-semibold">
               Dashboard settings
@@ -36,16 +36,27 @@ function Dashboard() {
                 />
               </p>
               <p>Angle joints measured in:</p>
-        
+
               <label>
-                Radians  <input type="radio" name="angleUnit" value="radians"
-                checked ={angleUnit === "radians"}
-                onChange = {() => setAngleUnit("radians")}/>
+                Radians{" "}
+                <input
+                  type="radio"
+                  name="angleUnit"
+                  value="radians"
+                  checked={angleUnit === "radians"}
+                  onChange={() => setAngleUnit("radians")}
+                />
               </label>
-              
-               <label>
-               Degrees   <input type ="radio" name="angleUnit" value="degrees" checked={angleUnit==="degrees"}
-               onChange={() => setAngleUnit("degrees")} />
+
+              <label>
+                Degrees{" "}
+                <input
+                  type="radio"
+                  name="angleUnit"
+                  value="degrees"
+                  checked={angleUnit === "degrees"}
+                  onChange={() => setAngleUnit("degrees")}
+                />
               </label>
               <DropdownMenu />
             </CardContent>
