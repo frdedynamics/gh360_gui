@@ -1,17 +1,12 @@
 import Camera from "@/components/Camera";
 import JointCard from "@/components/JointCard";
 import Model from "@/components/Model";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
-import { DropdownMenu } from "@/components/ui/dropdown-menu";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { JOINT_CONFIG } from "@/configs/jointConfigs";
-import { use, useState } from "react";
+import { useState } from "react";
 
 function Dashboard() {
   const [toggleCamera, setToggleCamera] = useState(false);
@@ -22,10 +17,12 @@ function Dashboard() {
     <div className="grid grid-cols-[2fr_1fr] h-dvh w-full overflow-hidden">
       {/* LEFT —*/}
       <div className="overflow-y-auto p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 2xl:text-4xl">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 2xl:text-3xl">
           <Card className="w-full">
             <CardHeader className="font-semibold">
-              Dashboard settings
+              <p className="underline underline-offset-4 2xl:underline-offset-8 2xl:text-6xl">
+                Dashbord settings
+              </p>
             </CardHeader>
             <CardContent className="flex flex-col gap-2 ">
               <p className="flex items-center gap-2">
@@ -38,28 +35,32 @@ function Dashboard() {
               </p>
               <p>Angle joints measured in:</p>
 
-              <label>
-                Radians{" "}
-                <input
-                  type="radio"
-                  name="angleUnit"
-                  value="radians"
-                  checked={angleUnit === "radians"}
-                  onChange={() => setAngleUnit("radians")}
-                />
-              </label>
-
-              <label>
-                Degrees{" "}
-                <input
-                  type="radio"
-                  name="angleUnit"
-                  value="degrees"
-                  checked={angleUnit === "degrees"}
-                  onChange={() => setAngleUnit("degrees")}
-                />
-              </label>
-              <DropdownMenu />
+              <RadioGroup
+                value={angleUnit}
+                onValueChange={setAngleUnit}
+                className="w-fit 2xl:gap-4"
+              >
+                <div className="flex items-center gap-3">
+                  <RadioGroupItem
+                    className="2xl:size-6"
+                    value="radians"
+                    id="r1"
+                  />
+                  <Label className="2xl:text-2xl" htmlFor="r1">
+                    Radians
+                  </Label>
+                </div>
+                <div className="flex items-center gap-3">
+                  <RadioGroupItem
+                    className="2xl:size-6"
+                    value="degrees"
+                    id="r2"
+                  />
+                  <Label className="2xl:text-2xl" htmlFor="r2">
+                    Degrees
+                  </Label>
+                </div>
+              </RadioGroup>
             </CardContent>
           </Card>
 

@@ -24,7 +24,7 @@ function JointCard({ jointName, index, motors, angleUnit }) {
   );
 
   return (
-    <Card className="w-full h-full flex flex-col overflow-hidden min-h-36">
+    <Card className="w-full h-full flex flex-col overflow-hidden min-h-36 2xl:min-h-64">
       <CardHeader className="text-lg shrink-0 xl:text-2xl 2xl:text-4xl">
         <CardTitle>{jointName.replaceAll("_", " ")}</CardTitle>
         <CardAction className="">
@@ -70,7 +70,7 @@ function JointCard({ jointName, index, motors, angleUnit }) {
           motorData?.map((motor, i) => (
             <div
               key={motors[i]}
-              className="mt-2 text-sm xl:text-base 2xl:text-3xl 2xl:flex 2xl:flex-col"
+              className="mt-2 text-sm xl:text-base 2xl:text-4xl 2xl:flex 2xl:flex-col"
             >
               <p className="font-semibold">Motor {motors[i] + 1}</p>
               <p className="ml-3">
