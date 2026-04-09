@@ -20,7 +20,7 @@ function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 2xl:text-3xl">
           <Card className="w-full">
             <CardHeader className="font-semibold">
-              <p className="underline underline-offset-4 2xl:underline-offset-8 2xl:text-6xl">
+              <p className="underline decoration-2 underline-offset-6 2xl:underline-offset-8 2xl:text-6xl">
                 Dashbord settings
               </p>
             </CardHeader>

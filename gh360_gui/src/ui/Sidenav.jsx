@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import ModeToggle from "@/components/ui/modeToggle";
 import useRosStore from "@/store/rosStore";
 import {
+  BotMessageSquare,
   CircleQuestionMark,
   Code,
   LayoutDashboard,
@@ -17,7 +18,7 @@ function Navbar() {
 
   const navbarOptions = [
     { icon: <LayoutDashboard />, name: "Dashboard" },
-    { icon: <CircleQuestionMark />, name: "Placeholder" },
+    { icon: <BotMessageSquare />, name: "Move robot arm" },
     { icon: <Code />, name: "Block Programming" },
   ];
 
