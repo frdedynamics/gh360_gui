@@ -27,10 +27,11 @@ function Dashboard() {
             <CardHeader className="font-semibold">
               Dashboard settings
             </CardHeader>
-            <CardContent className="flex flex-col gap-2">
+            <CardContent className="flex flex-col gap-2 ">
               <p className="flex items-center gap-2">
                 Enable camera
                 <Checkbox
+                  className="2xl:scale-200 2xl:ml-2"
                   checked={toggleCamera}
                   onCheckedChange={(checked) => setToggleCamera(checked)}
                 />

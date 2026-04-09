@@ -32,14 +32,14 @@ function Navbar() {
             className="flex gap-2 border-b-2 border-b-primary cursor-pointer hover:scale-105 2xl:text-4xl 2xl:gap-6"
             key={item.name}
           >
-            <div className="ml-2">{item.icon}</div>
+            <div className="ml-2 2xl:ml-6 2xl:scale-150">{item.icon}</div>
             <div>{item.name}</div>
           </button>
         ))}
       </div>
 
-      <div className="mt-auto flex flex-col gap-2 p-2 border-t-2 border-t-primary ">
-        <div className="flex items-center gap-2">
+      <div className="mt-auto flex flex-col gap-2 p-2 2xl:p-4 border-t-2 border-t-primary ">
+        <div className="flex items-center gap-2 2xl:gap-4">
           {/* Status indicator */}
           <div className="relative flex h-2 w-2 2xl:scale-150">
             <span
@@ -93,7 +93,7 @@ function Navbar() {
           </Button>
         </div>
         <div className="2xl:scale-150 2xl:origin-left p-2">
-          <ModeToggle className="2xl:size-12" />
+          <ModeToggle className="2xl:size-12" title="Toggle theme" />
         </div>
       </div>
     </nav>

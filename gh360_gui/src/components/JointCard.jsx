@@ -35,11 +35,14 @@ function JointCard({ jointName, index, motors, angleUnit }) {
           >
             {!moreInfo ? (
               <Plus
-                className="hover:rotate-90 hover:duration-300 bg-muted rounded-2xl"
+                className="hover:rotate-90 hover:duration-300 bg-muted rounded-2xl 2xl:scale-150"
                 strokeWidth={2.5}
               />
             ) : (
-              <Minus className="bg-muted rounded-2xl" strokeWidth={2.5} />
+              <Minus
+                className="bg-muted rounded-2xl 2xl:scale-150"
+                strokeWidth={2.5}
+              />
             )}
           </button>
         </CardAction>
