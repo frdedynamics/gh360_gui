@@ -12,11 +12,9 @@ import { useShallow } from "zustand/react/shallow";
 
 function JointCard({ jointName, index, motors, angleUnit }) {
   const [moreInfo, setMoreInfo] = useState(false);
-
   const jointAngle = useRosStore(
     (s) => s.jointMessage?.position[index] ?? null,
   );
-
   const motorData = useRosStore(
     useShallow((s) =>
       s.motorMessage ? motors.map((i) => s.motorMessage.motors[i]) : null,
@@ -24,10 +22,10 @@ function JointCard({ jointName, index, motors, angleUnit }) {
   );
 
   return (
-    <Card className="w-full h-full flex flex-col overflow-hidden min-h-36 2xl:min-h-64">
-      <CardHeader className="text-lg shrink-0 xl:text-2xl 2xl:text-4xl">
+    <Card className="w-full h-full flex flex-col overflow-hidden min-h-24 sm:min-h-28 md:min-h-32 lg:min-h-36 xl:min-h-36 2xl:min-h-44">
+      <CardHeader className="text-sm shrink-0 sm:text-base md:text-base lg:text-lg xl:text-2xl 2xl:text-3xl">
         <CardTitle>{jointName.replaceAll("_", " ")}</CardTitle>
-        <CardAction className="">
+        <CardAction>
           <button
             className="cursor-pointer"
             onClick={() => setMoreInfo((prev) => !prev)}
@@ -35,28 +33,29 @@ function JointCard({ jointName, index, motors, angleUnit }) {
           >
             {!moreInfo ? (
               <Plus
-                className="hover:rotate-90 hover:duration-300 bg-muted rounded-2xl 2xl:scale-150"
+                className="hover:rotate-90 hover:duration-300 bg-muted rounded-2xl sm:scale-90 md:scale-90 lg:scale-100 xl:scale-110 2xl:scale-125"
                 strokeWidth={2.5}
               />
             ) : (
               <Minus
-                className="bg-muted rounded-2xl 2xl:scale-150"
+                className="bg-muted rounded-2xl sm:scale-90 md:scale-90 lg:scale-100 xl:scale-110 2xl:scale-125"
                 strokeWidth={2.5}
               />
             )}
           </button>
         </CardAction>
       </CardHeader>
+
       <CardContent className="flex-1 overflow-hidden">
         {jointAngle === null ? (
           <p>Waiting for data...</p>
         ) : (
-          <div className="pt-2">
-            <div className="text-3xl xl:text-4xl 2xl:text-9xl">
+          <div className="pt-1 sm:pt-1 md:pt-2 lg:pt-2 xl:pt-2">
+            <div className="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl">
               {angleUnit === "radians"
-                ? jointAngle.toFixed(3)
-                : (jointAngle * (180 / Math.PI)).toFixed(3)}
-              <span className="opacity-50 text-xl xl:text-2xl 2xl:text-8xl">
+                ? jointAngle.toFixed(2)
+                : (jointAngle * (180 / Math.PI)).toFixed(2)}
+              <span className="opacity-50 text-sm sm:text-base md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl">
                 {angleUnit === "radians" ? (
                   <span>rad</span>
                 ) : (
@@ -66,20 +65,21 @@ function JointCard({ jointName, index, motors, angleUnit }) {
             </div>
           </div>
         )}
+
         {moreInfo &&
           motorData?.map((motor, i) => (
             <div
               key={motors[i]}
-              className="mt-2 text-sm xl:text-base 2xl:text-4xl 2xl:flex 2xl:flex-col"
+              className="mt-1 sm:mt-1 md:mt-2 lg:mt-2 xl:mt-2 text-xs sm:text-xs md:text-sm lg:text-sm xl:text-base 2xl:text-lg"
             >
               <p className="font-semibold">Motor {motors[i] + 1}</p>
-              <p className="ml-3">
+              <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
                 Position: {motor.present_position.toFixed(3)}
               </p>
-              <p className="ml-3">
+              <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
                 Velocity: {motor.present_velocity.toFixed(3)}
               </p>
-              <p className="ml-3">
+              <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
                 Current: {motor.present_current.toFixed(3)}
               </p>
             </div>

@@ -96,7 +96,7 @@ function Camera({ toggleCamera, setToggleCamera }) {
       />
 
       {!toggleCamera && (
-        <div className="flex flex-1 items-center justify-center 2xl:scale-200 flex-col">
+        <div className="flex flex-1 items-center justify-center 2xl:scale-100 flex-col">
           <VideoOff size={88} />
           <p className="text-muted-foreground">
             Camera is currently turned off
