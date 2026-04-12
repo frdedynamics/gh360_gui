@@ -1,11 +1,12 @@
 import Camera from "@/components/Camera";
 import JointCard from "@/components/JointCard";
 import Model from "@/components/Model";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { JOINT_CONFIG } from "@/configs/jointConfigs";
+import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 
 function Dashboard() {
@@ -23,14 +24,6 @@ function Dashboard() {
               </p>
             </CardHeader>
             <CardContent className="flex flex-col gap-2 md:gap-2 lg:gap-3 xl:gap-3 2xl:gap-3">
-              <p className="flex items-center gap-2">
-                Enable camera
-                <Checkbox
-                  className="sm:scale-90 md:scale-90 lg:scale-100 xl:scale-110 2xl:scale-125 2xl:ml-1"
-                  checked={toggleCamera}
-                  onCheckedChange={(checked) => setToggleCamera(checked)}
-                />
-              </p>
               <p>Angle joints measured in:</p>
               <RadioGroup
                 value={angleUnit}
@@ -80,14 +73,33 @@ function Dashboard() {
       </div>
 
       <aside className="hidden sm:flex flex-col h-full gap-2 p-2 md:gap-2 md:p-2 lg:gap-2 lg:p-2 xl:gap-2 xl:p-2 2xl:gap-3 2xl:p-3 overflow-hidden">
-        <div className="flex-1 min-h-0">
-          <Model />
-          {/* <div className="flex-1 min-h-0">
-          <Camera
-            setToggleCamera={setToggleCamera}
-            toggleCamera={toggleCamera}
-          />
-        </div> */}
+        <div className={toggleCamera ? "flex-1 min-h-0" : "h-full"}>
+          <Model setToggleCamera={setToggleCamera} />
+        </div>
+
+        <div className="flex justify-between items-center px-2">
+          <p>Camera feed</p>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setToggleCamera((bool) => !bool)}
+            title="Toggle camera feed"
+          >
+            {toggleCamera ? (
+              <>
+                <EyeOff />
+              </>
+            ) : (
+              <>
+                <Eye />
+              </>
+            )}
+          </Button>
+        </div>
+
+        {/* Always mounted so ROS subscription stays alive */}
+        <div className={toggleCamera ? "flex-1 min-h-0" : "hidden"}>
+          <Camera toggleCamera={toggleCamera} />
         </div>
       </aside>
     </div>

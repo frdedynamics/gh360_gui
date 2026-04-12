@@ -9,14 +9,14 @@ function Applayout() {
   return (
     //  Create a page layout that is divided in two columns.
     <div
-      className={`grid h-dvh ${
+      className={`grid h-dvh  ${
         openNavbar
           ? "grid-cols-[260px_1fr] 2xl:grid-cols-[360px_1fr]"
           : "grid-cols-1"
       }`}
     >
       {openNavbar ? (
-        <aside className="bg-nav border-r-2">
+        <aside className="bg-nav border-r-2 ">
           <Navbar setOpenNavbar={setOpenNavbar} />
         </aside>
       ) : (
@@ -24,6 +24,7 @@ function Applayout() {
           <button
             className="cursor-pointer"
             onClick={() => setOpenNavbar((bool) => !bool)}
+            title="Open navigation bar"
           >
             <PanelLeftOpen />
           </button>

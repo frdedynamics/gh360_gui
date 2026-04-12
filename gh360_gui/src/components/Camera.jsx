@@ -1,12 +1,11 @@
 import useRosTopic from "@/hooks/useRosTopics";
 import { useEffect, useRef } from "react";
-import { Button } from "./ui/button";
 import { VideoOff } from "lucide-react";
 
-function Camera({ toggleCamera, setToggleCamera }) {
+function Camera({ toggleCamera }) {
   const canvasRef = useRef(null);
   const arucoRef = useRef(null);
-  const isActiveRef = useRef(false);
+  const isActiveRef = useRef(toggleCamera);
 
   useEffect(() => {
     isActiveRef.current = toggleCamera;
@@ -36,14 +35,12 @@ function Camera({ toggleCamera, setToggleCamera }) {
         canvas.height = msg.height;
       }
 
-      // Decode base64
       const binaryString = atob(msg.data);
       const bytes = new Uint8Array(binaryString.length);
       for (let i = 0; i < binaryString.length; i++) {
         bytes[i] = binaryString.charCodeAt(i);
       }
 
-      // Draw camera frame
       const imageData = ctx.createImageData(canvas.width, canvas.height);
       for (let i = 0, j = 0; i < bytes.length; i += 3, j += 4) {
         imageData.data[j] = bytes[i];
@@ -53,7 +50,6 @@ function Camera({ toggleCamera, setToggleCamera }) {
       }
       ctx.putImageData(imageData, 0, 0);
 
-      // Draw aruco markers on top
       const aruco = arucoRef.current;
       if (aruco && aruco.marker_ids.length > 0) {
         aruco.marker_ids.forEach((id, index) => {
@@ -71,7 +67,6 @@ function Camera({ toggleCamera, setToggleCamera }) {
           ctx.strokeStyle = "lime";
           ctx.lineWidth = 3;
           ctx.stroke();
-
           ctx.font = "bold 16px sans-serif";
           ctx.fillStyle = "lime";
           ctx.fillText(`ID: ${id}`, x + 18, y + 5);
@@ -81,26 +76,17 @@ function Camera({ toggleCamera, setToggleCamera }) {
   );
 
   return (
-    <div className="flex flex-col w-full h-full">
-      <div className="flex items-center justify-between p-2">
-        <p className="text-sm font-semibold 2xl:text-3xl">Camera Feed</p>
-      </div>
-
-      <canvas
-        ref={canvasRef}
-        className="w-full h-full object-contain"
-        style={{
-          transform: "scaleY(-1)",
-          display: toggleCamera ? "block" : "none",
-        }}
-      />
-
-      {!toggleCamera && (
-        <div className="flex flex-1 items-center justify-center 2xl:scale-100 flex-col">
-          <VideoOff size={88} />
-          <p className="text-muted-foreground">
-            Camera is currently turned off
-          </p>
+    <div className="flex flex-col w-full h-full p-4">
+      {toggleCamera ? (
+        <canvas
+          ref={canvasRef}
+          className="w-full h-full"
+          style={{ transform: "scaleY(-1)" }}
+        />
+      ) : (
+        <div className="flex flex-1 items-center justify-center flex-col gap-2 text-muted-foreground">
+          <VideoOff size={48} />
+          <p className="text-sm">Camera is turned off</p>
         </div>
       )}
     </div>
