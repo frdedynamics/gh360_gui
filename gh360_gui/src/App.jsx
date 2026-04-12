@@ -20,7 +20,7 @@ function App() {
         <Routes>
           {/* Applayout as parent component (sidebar + page) with <Outlet> as children component of the applayout */}
           <Route element={<Applayout />}>
-            <Route index element={<Dashboard />} />
+            <Route index path="" element={<Dashboard />} />
             <Route path="moverobot" element={<MoveRobot />} />
           </Route>
         </Routes>
