@@ -1,4 +1,4 @@
-import { useState, memo } from "react";
+import { useState, memo, useMemo } from "react";
 import {
   Card,
   CardAction,
@@ -8,18 +8,17 @@ import {
 } from "./ui/card";
 import { Minus, Plus } from "lucide-react";
 import useRosStore from "@/store/rosStore";
-import { useShallow } from "zustand/react/shallow";
 
 function JointCard({ jointName, index, motors, angleUnit }) {
   const [moreInfo, setMoreInfo] = useState(false);
-  const jointAngle = useRosStore(
-    (s) => s.jointMessage?.position[index] ?? null,
-  );
-  const motorData = useRosStore(
-    useShallow((s) =>
-      s.motorMessage ? motors.map((i) => s.motorMessage.motors[i]) : null,
-    ),
-  );
+  const jointPositions = useRosStore((s) => s.jointPositions);
+  const motorStates = useRosStore((s) => s.motorStates);
+
+  const jointAngle = jointPositions?.[index] ?? null;
+  const motorData = useMemo(() => {
+    if (!motorStates) return null;
+    return motors.map((i) => motorStates[i]);
+  }, [motorStates, motors]);
 
   return (
     <Card className="w-full h-full flex flex-col overflow-hidden min-h-24 sm:min-h-28 md:min-h-32 lg:min-h-36 xl:min-h-36 2xl:min-h-44">
@@ -45,7 +44,6 @@ function JointCard({ jointName, index, motors, angleUnit }) {
           </button>
         </CardAction>
       </CardHeader>
-
       <CardContent className="flex-1 overflow-hidden">
         {jointAngle === null ? (
           <p>Waiting for data...</p>
@@ -65,7 +63,6 @@ function JointCard({ jointName, index, motors, angleUnit }) {
             </div>
           </div>
         )}
-
         {moreInfo &&
           motorData?.map((motor, i) => (
             <div
@@ -74,16 +71,13 @@ function JointCard({ jointName, index, motors, angleUnit }) {
             >
               <p className="font-semibold">Motor {motors[i] + 1}</p>
               <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
-                Position: {motor.present_position.toFixed(2)}
-                <span className="text-muted-foreground">rad</span>
+                Position: {motor.present_position.toFixed(3)}
               </p>
               <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
-                Velocity: {motor.present_velocity.toFixed(2)}
-                <span className="text-muted-foreground">rad</span>
+                Velocity: {motor.present_velocity.toFixed(3)}
               </p>
               <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
-                Current: {motor.present_current.toFixed(2)}
-                <span className="text-muted-foreground ">mA</span>
+                Current: {motor.present_current.toFixed(3)}
               </p>
             </div>
           ))}
