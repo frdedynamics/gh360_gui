@@ -10,6 +10,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useState } from "react";
+import { NavLink } from "react-router-dom";
 
 function Navbar({ setOpenNavbar }) {
   const { status, disconnect, reconnect } = useRosStore();
@@ -22,6 +23,18 @@ function Navbar({ setOpenNavbar }) {
     { icon: <Code />, name: "Block Programming" },
   ];
 
+  const navbarOptions2 = [
+    { icon: <LayoutDashboard />, navlink: <NavLink to="/">Dashboard</NavLink> },
+    {
+      icon: <BotMessageSquare />,
+      navlink: <NavLink to="/moverobot">Move robot arm</NavLink>,
+    },
+    {
+      icon: <Code />,
+      navlink: <NavLink to="/block_programming">Block programming</NavLink>,
+    },
+  ];
+
   return (
     <nav className="flex flex-col h-full w-full relative">
       <div className="text-xl items-center justify-center font-semibold p-2 sm:text-2xl sm:p-3 md:text-2xl md:p-3 lg:text-3xl lg:p-4 xl:text-2xl xl:p-5 2xl:text-5xl 2xl:p-6">
@@ -29,7 +42,7 @@ function Navbar({ setOpenNavbar }) {
       </div>
 
       {/* //Closeable Navbar Button  */}
-      <div className="absolute -right-3 top-2 z-10">
+      <div className="absolute -right-2 top-2 z-10">
         <button
           title="Close navigation bar"
           className="cursor-pointer"
@@ -40,7 +53,7 @@ function Navbar({ setOpenNavbar }) {
       </div>
 
       <div className="flex flex-col gap-5 mt-2">
-        {navbarOptions.map((item) => (
+        {navbarOptions2.map((item) => (
           <button
             className="flex gap-2 border-b-2 border-b-primary cursor-pointer hover:scale-105 sm:gap-3 md:gap-3 lg:gap-4 xl:gap-5 2xl:text-2xl 2xl:gap-6"
             key={item.name}
@@ -48,7 +61,7 @@ function Navbar({ setOpenNavbar }) {
             <div className="ml-2 sm:ml-3 md:ml-3 lg:ml-4 xl:ml-5 2xl:ml-6 2xl:scale-125">
               {item.icon}
             </div>
-            <div>{item.name}</div>
+            <div>{item.navlink}</div>
           </button>
         ))}
       </div>

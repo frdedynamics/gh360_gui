@@ -1,42 +1,72 @@
 import { create } from "zustand";
 import * as ROSLIB from "roslib";
 
+const FPS = 20;
+const FRAME_TIME = 1000 / FPS;
+
+let latestJoint = null;
+let latestMotor = null;
+let intervalId = null;
+
 const useRosStore = create((set, get) => ({
   ros: null,
   status: "disconnected",
   intentionalDisconnect: false,
 
-  jointMessage: null,
-  motorMessage: null,
+  jointPositions: null,
+  motorStates: null,
 
   jointTopic: null,
   motorTopic: null,
+
+  startRenderLoop: () => {
+    if (intervalId) return;
+
+    intervalId = setInterval(() => {
+      if (!latestJoint && !latestMotor) return;
+
+      set({
+        jointPositions: latestJoint?.position ?? null,
+        motorStates: latestMotor?.motors ?? null,
+      });
+    }, FRAME_TIME);
+  },
+
+  stopRenderLoop: () => {
+    if (intervalId) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+  },
 
   subscribeToTopics: () => {
     const ros = get().ros;
     if (!ros) return;
 
-    // Prevent duplicate subscriptions
     get().unsubscribeFromTopics();
 
     const jointTopic = new ROSLIB.Topic({
       ros,
       name: "/gh360/joint_states",
       messageType: "sensor_msgs/msg/JointState",
-      throttle_rate: 200,
     });
 
     const motorTopic = new ROSLIB.Topic({
       ros,
       name: "/gh360/motor_states_sorted",
       messageType: "gh360_interfaces/msg/PortStatus",
-      throttle_rate: 200,
     });
 
-    jointTopic.subscribe((msg) => set({ jointMessage: msg }));
-    motorTopic.subscribe((msg) => set({ motorMessage: msg }));
+    jointTopic.subscribe((msg) => {
+      latestJoint = msg;
+    });
+
+    motorTopic.subscribe((msg) => {
+      latestMotor = msg;
+    });
 
     set({ jointTopic, motorTopic });
+    get().startRenderLoop();
   },
 
   unsubscribeFromTopics: () => {
@@ -45,9 +75,16 @@ const useRosStore = create((set, get) => ({
     jointTopic?.unsubscribe();
     motorTopic?.unsubscribe();
 
+    get().stopRenderLoop();
+
+    latestJoint = null;
+    latestMotor = null;
+
     set({
       jointTopic: null,
       motorTopic: null,
+      jointPositions: null,
+      motorStates: null,
     });
   },
 
@@ -73,8 +110,6 @@ const useRosStore = create((set, get) => ({
       set({
         status: "disconnected",
         ros: null,
-        jointMessage: null,
-        motorMessage: null,
       });
 
       if (!get().intentionalDisconnect) {
@@ -93,7 +128,6 @@ const useRosStore = create((set, get) => ({
   reconnect: () => {
     const ros = get().ros;
 
-    // force intentional disconnect
     set({ intentionalDisconnect: true });
 
     if (ros) {
