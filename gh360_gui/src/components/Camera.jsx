@@ -76,7 +76,7 @@ function Camera({ toggleCamera }) {
   );
 
   return (
-    <div className="flex flex-col w-full h-full p-4">
+    <div className="flex flex-col w-full h-full p-4 ">
       {toggleCamera ? (
         <canvas
           ref={canvasRef}
