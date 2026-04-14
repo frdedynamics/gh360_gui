@@ -71,13 +71,31 @@ function JointCard({ jointName, index, motors, angleUnit }) {
             >
               <p className="font-semibold">Motor {motors[i] + 1}</p>
               <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
-                Position: {motor.present_position.toFixed(3)}
+                Position:{motor.present_position.toFixed(2)}
+                <span className="opacity-50">
+                  {angleUnit === "radians" ? (
+                    <span>rad</span>
+                  ) : (
+                    <span>deg</span>
+                  )}
+                </span>
               </p>
               <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
-                Velocity: {motor.present_velocity.toFixed(3)}
+                Velocity:{" "}
+                {angleUnit === "radians"
+                  ? motor.present_velocity.toFixed(2)
+                  : (motor.present_velocity * (180 / Math.PI)).toFixed(2)}
+                <span className="opacity-50">
+                  {angleUnit === "radians" ? (
+                    <span>rad/s</span>
+                  ) : (
+                    <span>deg/s</span>
+                  )}{" "}
+                </span>
               </p>
               <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
-                Current: {motor.present_current.toFixed(3)}
+                Current: {motor.present_current.toFixed(2)}
+                <span className="opacity-50">mA</span>
               </p>
             </div>
           ))}

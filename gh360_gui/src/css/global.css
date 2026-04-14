@@ -1,8 +1,12 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@fontsource/inter/500.css";
+@import "@fontsource/jetbrains-mono/500.css";
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  --font-mono: "JetBrains Mono", monospace;
+  --font-sans: "Inter", sans-serif;
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
@@ -119,6 +123,6 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-mono;
   }
 }
