@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { JOINT_CONFIG } from "@/configs/jointConfigs";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Video, VideoOff } from "lucide-react";
 import { useState } from "react";
 
 function Dashboard() {
@@ -87,11 +87,11 @@ function Dashboard() {
           >
             {toggleCamera ? (
               <>
-                <EyeOff />
+                <VideoOff />
               </>
             ) : (
               <>
-                <Eye />
+                <Video />
               </>
             )}
           </Button>
