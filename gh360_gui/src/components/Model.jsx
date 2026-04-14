@@ -1,6 +1,9 @@
-import React, { useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Card } from "@/components/ui/card.jsx";
 import useRosStore from "@/store/rosStore.js";
+import * as THREE from "three";
+import URDFLoader from "urdf-loader";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 const JOINT_MAP = {
   shoulder_yaw: 0,
@@ -12,42 +15,109 @@ const JOINT_MAP = {
   wrist_pitch: 6,
 };
 
-function Model({ setToggleCamera }) {
-  const modelFrame = useRef(null);
-  const jointMessage = useRosStore((s) => s.jointMessage);
+function Model() {
+  const mountRef = useRef(null);
+  const robotRef = useRef(null);
+  const rendererRef = useRef(null);
+  const needsRenderRef = useRef(true);
+
+  const jointPositions = useRosStore((s) => s.jointPositions);
 
   useEffect(() => {
-    if (!jointMessage || !modelFrame.current) return;
-    const win = modelFrame.current.contentWindow;
-    if (!win) return;
+    const mount = mountRef.current;
+    if (!mount) return;
 
-    jointMessage.name.forEach((name) => {
-      const angle = jointMessage.position[JOINT_MAP[name]];
-      try {
-        if (typeof win.moveJoint === "function") {
-          win.moveJoint(name, angle);
-        } else {
-          console.warn("moveJoint not defined on iframe window");
-        }
-      } catch (err) {
-        console.error("Error calling moveJoint on iframe:", err);
-      }
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      mount.clientWidth / mount.clientHeight,
+      0.1,
+      150,
+    );
+    scene.add(camera);
+    camera.position.set(-0.5, 0, 1.3);
+    camera.lookAt(0, -0.2, 0);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setClearColor(0xffffff);
+    renderer.setSize(mount.clientWidth, mount.clientHeight);
+    mount.appendChild(renderer.domElement);
+    rendererRef.current = renderer;
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.set(0.2, 0, 0.15);
+    controls.update();
+    controls.addEventListener("change", () => {
+      needsRenderRef.current = true;
     });
-  }, [jointMessage]);
+
+    const light1 = new THREE.DirectionalLight(0xffffff, 1);
+    const light2 = new THREE.DirectionalLight(0xffffff, 1);
+    light1.position.set(1, 1, 1);
+    light2.position.set(-1, -1, -1);
+    scene.add(light1, light2);
+
+    const loader = new URDFLoader();
+    loader.packages = { gh360: "/gh360-threejs-model" };
+    loader.load("/gh360-threejs-model/urdf/gh360.urdf", (robot) => {
+      robot.traverse((child) => {
+        if (child.isMesh) {
+          child.material = new THREE.MeshStandardMaterial({ color: 0x888888 });
+        }
+      });
+      scene.add(robot);
+      robotRef.current = robot;
+      needsRenderRef.current = true;
+    });
+
+    const handleResize = () => {
+      if (!mount) return;
+      camera.aspect = mount.clientWidth / mount.clientHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(mount.clientWidth, mount.clientHeight);
+      needsRenderRef.current = true;
+    };
+    const resizeObserver = new ResizeObserver(handleResize);
+    resizeObserver.observe(mount);
+
+    // render continuously for 3s to catch the robot loading, then on-demand
+    const loadDeadline = Date.now() + 3000;
+    let animFrameId;
+    const animate = () => {
+      animFrameId = requestAnimationFrame(animate);
+      if (!needsRenderRef.current && Date.now() > loadDeadline) return;
+      renderer.render(scene, camera);
+      needsRenderRef.current = false;
+    };
+    animate();
+
+    return () => {
+      cancelAnimationFrame(animFrameId);
+      resizeObserver.disconnect();
+      controls.dispose();
+      renderer.dispose();
+      if (mount.contains(renderer.domElement))
+        mount.removeChild(renderer.domElement);
+      robotRef.current = null;
+      rendererRef.current = null;
+    };
+  }, []);
+
+  // joint update — fires when ROS data arrives
+  useEffect(() => {
+    if (!jointPositions || !robotRef.current) return;
+    Object.entries(JOINT_MAP).forEach(([name, index]) => {
+      const angle = jointPositions[index];
+      if (angle === undefined) return;
+      robotRef.current.setJointValue(name, angle);
+    });
+    needsRenderRef.current = true;
+  }, [jointPositions]);
 
   return (
     <div className="flex justify-center h-full text-foreground p-2 flex-col">
       <Card className="w-full h-full p-0 overflow-hidden">
-        <div className="robotarm-iframe w-full h-full min-h-0">
-          <iframe
-            ref={modelFrame}
-            name="robotarm-iframe"
-            src="../../gh360%20ThreeJS%20model/Model%20robotarm.html"
-            title="Robot arm model"
-            sandbox="allow-scripts allow-same-origin"
-            className="w-full h-full border-0 block"
-          />
-        </div>
+        <div ref={mountRef} className="w-full h-full min-h-0" />
       </Card>
     </div>
   );
