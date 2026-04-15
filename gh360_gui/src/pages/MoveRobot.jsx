@@ -90,7 +90,7 @@ function MoveRobot() {
             <div className="overflow-y-auto p-2 sm:p-3 md:p-3 lg:p-4 xl:p-4 2xl:p-5">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 ...">
                     <Card className="w-full">
-                        <CardHeader className="font-semibold">Dashboard settings</CardHeader>
+                        <CardHeader className="font-semibold">Settings</CardHeader>
                         <CardContent className="flex flex-col gap-2 ...">
                             <p>Angle joints measured in:</p>
                             <RadioGroup value={angleUnit} onValueChange={setAngleUnit} className="w-fit gap-2 ...">
