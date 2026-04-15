@@ -10,7 +10,7 @@ import { Minus, Plus } from "lucide-react";
 import useRosStore from "@/store/rosStore";
 import { useShallow } from "zustand/react/shallow";
 
-function JointCard({ jointName, index, motors, angleUnit }) {
+function JointCard({ jointName, index, motors, angleUnit, children }) {
   const [moreInfo, setMoreInfo] = useState(false);
   const jointAngle = useRosStore(
     (s) => s.jointMessage?.position[index] ?? null,
@@ -84,6 +84,7 @@ function JointCard({ jointName, index, motors, angleUnit }) {
               </p>
             </div>
           ))}
+          {children}
       </CardContent>
     </Card>
   );

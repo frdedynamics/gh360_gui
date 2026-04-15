@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import * as ROSLIB from "roslib";
+import {JOINT_CONFIG} from "@/configs/jointConfigs.js";
 
 const useRosStore = create((set, get) => ({
   ros: null,
@@ -12,6 +13,8 @@ const useRosStore = create((set, get) => ({
   jointTopic: null,
   motorTopic: null,
 
+  jointPublisher: null,
+
   subscribeToTopics: () => {
     const ros = get().ros;
     if (!ros) return;
@@ -23,14 +26,14 @@ const useRosStore = create((set, get) => ({
       ros,
       name: "/gh360/joint_states",
       messageType: "sensor_msgs/msg/JointState",
-      throttle_rate: 200,
+      throttle_rate: 100,
     });
 
     const motorTopic = new ROSLIB.Topic({
       ros,
       name: "/gh360/motor_states_sorted",
       messageType: "gh360_interfaces/msg/PortStatus",
-      throttle_rate: 200,
+      throttle_rate: 100,
     });
 
     jointTopic.subscribe((msg) => set({ jointMessage: msg }));
@@ -39,15 +42,44 @@ const useRosStore = create((set, get) => ({
     set({ jointTopic, motorTopic });
   },
 
+  publishJointMessage: (payload) => {
+      const ros = get().ros;
+      if (!ros) {
+          console.warn("ROS not connected — cannot publish joint message");
+          return;
+      }
+
+      let jointPub = get().jointPublisher;
+      if (!jointPub) {
+          jointPub = new ROSLIB.Topic({
+              ros,
+              name: "/gh360/joint_states",
+              messageType: "sensor_msgs/msg/JointState",
+          });
+          set({ jointPublisher: jointPub });
+      }
+      const currentJointMsg = get().jointMessage || {};
+      const optimisticMsg = {
+          ...currentJointMsg,
+          name: JOINT_CONFIG.map(j => j.jointName),
+          position: payload.position.map((v) => Number(v)),
+      };
+      set({ jointMessage: optimisticMsg });
+
+      jointPub.publish(payload);
+  },
+
   unsubscribeFromTopics: () => {
-    const { jointTopic, motorTopic } = get();
+    const { jointTopic, motorTopic, jointPublisher } = get();
 
     jointTopic?.unsubscribe();
     motorTopic?.unsubscribe();
 
+    jointPublisher?.unadvertise?.();
     set({
       jointTopic: null,
       motorTopic: null,
+      jointPublisher: null,
     });
   },
 
