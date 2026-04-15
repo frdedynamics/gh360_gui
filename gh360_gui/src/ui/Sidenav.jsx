@@ -4,6 +4,7 @@ import useRosStore from "@/store/rosStore";
 import {
   BotMessageSquare,
   Code,
+  FileQuestionMark,
   LayoutDashboard,
   PanelLeftClose,
   Power,
@@ -33,6 +34,7 @@ function Navbar({ setOpenNavbar }) {
       icon: <Code />,
       navlink: <NavLink to="/block_programming">Block programming</NavLink>,
     },
+    { icon: <FileQuestionMark />, navlink: <NavLink to="instruction_page"> Instructions</NavLink>}
   ];
 
   return (
