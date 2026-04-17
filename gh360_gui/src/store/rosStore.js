@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import * as ROSLIB from "roslib";
-import {JOINT_CONFIG} from "@/configs/jointConfigs.js";
 
 const useRosStore = create((set, get) => ({
   ros: null,
@@ -58,14 +57,6 @@ const useRosStore = create((set, get) => ({
           });
           set({ jointPublisher: jointPub });
       }
-      const currentJointMsg = get().jointMessage || {};
-      const optimisticMsg = {
-          ...currentJointMsg,
-          name: JOINT_CONFIG.map(j => j.jointName),
-          position: payload.position.map((v) => Number(v)),
-      };
-      set({ jointMessage: optimisticMsg });
-
       jointPub.publish(payload);
   },
 

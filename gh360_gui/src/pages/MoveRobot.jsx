@@ -9,24 +9,34 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group.jsx";
 import { Input } from "@/components/ui/input.jsx";
 import { Slider } from "@/components/ui/slider.jsx";
 import { Button } from "@/components/ui/button.jsx";
-import {shallow} from "zustand/vanilla/shallow";
 
 function MoveRobot() {
 
-    const initialJointValues = JOINT_CONFIG.reduce((acc, j) => {
-        acc[j.jointName] = 0;
-        return acc;
-    }, {});
+    const initialJointValues = {
+        name: JOINT_CONFIG.map(j => j.jointName),
+        position: JOINT_CONFIG.map(() => 0),
+    };
     const [jointValues, setJointValues] = useState(initialJointValues);
-    const lastEditRef = useRef(JOINT_CONFIG.reduce((acc, j) => { acc[j.jointName] = 0; return acc; }, {}));
+    const jointValuesRef = useRef(initialJointValues);
+    useEffect(() => {
+        jointValuesRef.current = jointValues;
+    }, [jointValues]);
+
     const [angleUnit, setAngleUnit] = useState("radians");
 
+    // RosStore function for publishing messages.
     const publishJointMessage = useRosStore((s) => s.publishJointMessage);
-    const jointPositions = useRosStore(s => s.jointMessage?.position ?? null, shallow);
+
+    // References for cooldown logic for sending messages.
+    const SEND_COOLDOWN_MS = 6000; // 6 seconds cooldown, easy way to keep messages ordered.
+    const sendQueueRef = useRef([]);
+    const sendingRef = useRef(false);
+    const cooldownTimerRef = useRef(null);
 
     const RAD_TO_DEG = (r) => Number((r * 180 / Math.PI).toFixed(2));
     const DEG_TO_RAD = (d) => Number((d * Math.PI / 180));
 
+    // Joint limits for each joint (used to clamp input numbers to limits)
     const jointLimits = {
         shoulder_yaw:   { lower: -1.571, upper:  1.571, lowerdeg: RAD_TO_DEG(-1.571), upperdeg: RAD_TO_DEG(1.571) },
         shoulder_roll:  { lower: -1.571, upper:  1.571, lowerdeg: RAD_TO_DEG(-1.571), upperdeg: RAD_TO_DEG(1.571) },
@@ -37,53 +47,73 @@ function MoveRobot() {
         wrist_pitch:    { lower: -1.571, upper:  1.571, lowerdeg: RAD_TO_DEG(-1.571), upperdeg: RAD_TO_DEG(1.571) },
     };
 
+    // Function for setting the values of the joints in the message.
     function setJointValueForJoint(jointName, input, min, max) {
         if (!jointName) return;
         let val = (angleUnit === "degrees") ? DEG_TO_RAD(Number(input)) : Number(input);
         if (Number.isNaN(val)) return;
+        // clamp to limits if value is < min or > max.
         val = Math.max(min, Math.min(max, val));
-        lastEditRef.current[jointName] = Date.now();
-        setJointValues(prev => ({ ...prev, [jointName]: val }));
+        setJointValues(prev => {
+            const index = prev.name.indexOf(jointName);
+            if (index === -1) return prev;
+
+            const nextPositions = [...prev.position];
+            nextPositions[index] = val;
+
+            const next = {
+                ...prev,
+                position: nextPositions,
+            };
+
+            jointValuesRef.current = next;
+            return next;
+        });
     }
 
-    function sendNewJointAngle(jointName) {
-        if (!jointName) return;
+    function sendNewJointAngles() {
+        const item = sendQueueRef.current.shift();
+        if (!item) {
+            sendingRef.current = false;
+            return;
+        }
 
-        const positions = JOINT_CONFIG.map(j => {
-            const v = jointValues[j.jointName];
-            return Number.isFinite(Number(v)) ? Number(v) : 0;
-        });
+        // set current = true to show that it is currently sending.
+        sendingRef.current = true;
 
+        // publish now
         publishJointMessage({
             name: JOINT_CONFIG.map((j) => j.jointName),
-            position: positions,
+            position: item.position,
         });
 
-        lastEditRef.current[jointName] = 0;
+        // start cooldown
+        cooldownTimerRef.current = window.setTimeout(() => {
+            cooldownTimerRef.current = null;
+            if (sendQueueRef.current.length > 0) { // Queue at most 1 action.
+                sendNewJointAngles();
+            } else {
+                sendingRef.current = false;
+            }
+        }, SEND_COOLDOWN_MS);
     }
 
-    useEffect(() => {
-        if (!jointPositions) return;
+    function enqueueSend(jointName) {
+        const { name, position } = jointValuesRef.current;
 
-        const msgTime = Date.now();
-
-        const updates = {};
-        JOINT_CONFIG.forEach((j, idx) => {
-            const name = j.jointName;
-            const pos = jointPositions[idx] ?? 0;
-
-            if ((lastEditRef.current[name] || 0) < msgTime) {
-                if (jointValues[name] !== pos) {
-                    updates[name] = pos;
-                }
-            }
-        });
-
-        if (Object.keys(updates).length > 0) {
-            setJointValues(prev => ({ ...prev, ...updates }));
+        // only 1 item in queue
+        if (sendQueueRef.current.length < 1) {
+            sendQueueRef.current.push({
+                name: [...name],
+                position: [...position],
+                timeRequested: Date.now(),
+            });
         }
-    }, [jointPositions]);
 
+        if (!sendingRef.current) {
+            sendNewJointAngles();
+        }
+    }
 
     return (
         <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] h-dvh w-full overflow-hidden">
@@ -103,15 +133,23 @@ function MoveRobot() {
                                     <Label htmlFor="r2">Degrees</Label>
                                 </div>
                             </RadioGroup>
+                            <Button
+                                onClick={() => {
+                                    enqueueSend();
+                                }}
+                            >
+                                Send
+                            </Button>
                         </CardContent>
                     </Card>
 
                     {JOINT_CONFIG.map((joint) => {
                         const limit = jointLimits[joint.jointName];
 
+                        const index = jointValuesRef.current.name.indexOf(joint.jointName);
                         const displayValue = angleUnit === "degrees"
-                            ? RAD_TO_DEG(jointValues[joint.jointName])
-                            : jointValues[joint.jointName];
+                            ? RAD_TO_DEG(jointValuesRef.current.position[index])
+                            : jointValuesRef.current.position[index];
 
                         const min = angleUnit === "degrees" ? limit.lowerdeg : limit.lower;
                         const max = angleUnit === "degrees" ? limit.upperdeg : limit.upper;
@@ -144,14 +182,6 @@ function MoveRobot() {
                                             }}
                                         />
                                     </div>
-
-                                    <Button
-                                        onClick={() => {
-                                            sendNewJointAngle(joint.jointName);
-                                        }}
-                                    >
-                                        Send
-                                    </Button>
                                 </CardFooter>
                             </JointCard>
                         );
@@ -161,7 +191,7 @@ function MoveRobot() {
 
             <aside className="hidden sm:flex flex-col h-full gap-2 p-2 ...">
                 <div className="flex-1 min-h-0">
-                    <Model />
+                    <Model jointmsg={jointValuesRef.current}/>
                 </div>
             </aside>
         </div>
