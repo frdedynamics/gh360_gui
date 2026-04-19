@@ -81,7 +81,7 @@ function JointCard({ jointName, index, motors, angleUnit }) {
                 </span>
               </p>
               <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
-                Velocity:{" "}
+                Velocity:
                 {angleUnit === "radians"
                   ? motor.present_velocity.toFixed(2)
                   : (motor.present_velocity * (180 / Math.PI)).toFixed(2)}
