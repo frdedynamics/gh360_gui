@@ -6,6 +6,7 @@ import { useEffect } from "react";
 import { ThemeProvider } from "./components/ui/themeProvider";
 import MoveRobot from "./pages/MoveRobot";
 import BlockProgramming from "./pages/BlockProgramming";
+import InstructionPage from "./pages/InstructionPage";
 
 function App() {
   const { connect } = useRosStore();
@@ -24,6 +25,7 @@ function App() {
             <Route index path="" element={<Dashboard />} />
             <Route path="moverobot" element={<MoveRobot />} />
             <Route path="block_programming" element={<BlockProgramming />} />
+            <Route path="instruction_page" element={<InstructionPage />} /> 
           </Route>
         </Routes>
       </BrowserRouter>
