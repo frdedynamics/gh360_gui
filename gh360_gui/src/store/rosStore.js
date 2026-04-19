@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import * as ROSLIB from "roslib";
 
-const FPS = 20;
+const FPS = 10;
 const FRAME_TIME = 1000 / FPS;
 
 let latestJoint = null;

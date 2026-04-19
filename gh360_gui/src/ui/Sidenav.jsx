@@ -52,16 +52,16 @@ function Navbar({ setOpenNavbar }) {
         </button>
       </div>
 
-      <div className="flex flex-col gap-5 mt-2">
+      <div className="flex flex-col gap-5 mt-2 ">
         {navbarOptions2.map((item, i) => (
           <button
-            className="flex gap-2 border-b-2 border-b-primary cursor-pointer hover:scale-105 sm:gap-3 md:gap-3 lg:gap-4 xl:gap-5 2xl:text-2xl 2xl:gap-6"
+            className=" flex gap-2 border-b-2 border-b-primary cursor-pointer hover:scale-105 sm:gap-3 md:gap-3 lg:gap-4 xl:gap-5 2xl:text-2xl 2xl:gap-6"
             key={i}
           >
             <div className="ml-2 sm:ml-3 md:ml-3 lg:ml-4 xl:ml-5 2xl:ml-6 2xl:scale-125">
               {item.icon}
             </div>
-            <div>{item.navlink}</div>
+            <div className="">{item.navlink}</div>
           </button>
         ))}
       </div>

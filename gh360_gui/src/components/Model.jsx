@@ -103,7 +103,7 @@ function Model() {
     };
   }, []);
 
-  // joint update — fires when ROS data arrives
+  // joint update — fires when ROS data arrivess
   useEffect(() => {
     if (!jointPositions || !robotRef.current) return;
     Object.entries(JOINT_MAP).forEach(([name, index]) => {
