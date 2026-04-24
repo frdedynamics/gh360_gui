@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { JOINT_CONFIG } from "@/configs/jointConfigs";
-import { Eye, EyeOff, Video, VideoOff } from "lucide-react";
+import { Video, VideoOff } from "lucide-react";
 import { useState } from "react";
 
 function Dashboard() {
@@ -73,7 +73,7 @@ function Dashboard() {
       </div>
 
       <aside className="hidden sm:flex flex-col h-full gap-2 p-2 md:gap-2 md:p-2 lg:gap-2 lg:p-2 xl:gap-2 xl:p-2 2xl:gap-3 2xl:p-3 overflow-hidden">
-        <div className={toggleCamera ? "flex-1 min-h-0" : "h-full"}>
+        <div className={toggleCamera ? "flex-1 min-h-0 " : "h-full"}>
           <Model setToggleCamera={setToggleCamera} />
         </div>
 

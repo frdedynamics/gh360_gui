@@ -19,22 +19,19 @@ function Navbar({ setOpenNavbar }) {
   const [reconnectCooldown, setReconnectCooldown] = useState(false);
 
   const navbarOptions = [
-    { icon: <LayoutDashboard />, name: "Dashboard" },
-    { icon: <BotMessageSquare />, name: "Move robot arm" },
-    { icon: <Code />, name: "Block Programming" },
-  ];
-
-  const navbarOptions2 = [
     { icon: <LayoutDashboard />, navlink: <NavLink to="/">Dashboard</NavLink> },
     {
       icon: <BotMessageSquare />,
-      navlink: <NavLink to="/moverobot">Move robot arm</NavLink>,
+      navlink: <NavLink to="/moverobot">Move Robot Arm</NavLink>,
     },
     {
       icon: <Code />,
-      navlink: <NavLink to="/block_programming">Block programming</NavLink>,
+      navlink: <NavLink to="/block_programming">Block Programming</NavLink>,
     },
-    { icon: <FileQuestionMark />, navlink: <NavLink to="instruction_page"> Instructions</NavLink>}
+    {
+      icon: <FileQuestionMark />,
+      navlink: <NavLink to="instruction_page"> Instructions</NavLink>,
+    },
   ];
 
   return (
@@ -54,8 +51,8 @@ function Navbar({ setOpenNavbar }) {
         </button>
       </div>
 
-      <div className="flex flex-col gap-5 mt-2 ">
-        {navbarOptions2.map((item, i) => (
+      <div className="flex flex-col gap-5 mt-2 w-full">
+        {navbarOptions.map((item, i) => (
           <button
             className=" flex gap-2 border-b-2 border-b-primary cursor-pointer hover:scale-105 sm:gap-3 md:gap-3 lg:gap-4 xl:gap-5 2xl:text-2xl 2xl:gap-6"
             key={i}

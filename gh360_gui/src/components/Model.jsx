@@ -19,6 +19,8 @@ function Model() {
   const mountRef = useRef(null);
   const robotRef = useRef(null);
   const rendererRef = useRef(null);
+  const cameraRef = useRef(null);
+  const sceneRef = useRef(null);
   const needsRenderRef = useRef(true);
 
   const jointPositions = useRosStore((s) => s.jointPositions);
@@ -28,6 +30,8 @@ function Model() {
     if (!mount) return;
 
     const scene = new THREE.Scene();
+    sceneRef.current = scene;
+
     const camera = new THREE.PerspectiveCamera(
       75,
       mount.clientWidth / mount.clientHeight,
@@ -37,9 +41,11 @@ function Model() {
     scene.add(camera);
     camera.position.set(-0.5, 0, 1.3);
     camera.lookAt(0, -0.2, 0);
+    cameraRef.current = camera;
 
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setClearColor(0xffffff);
+    renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(mount.clientWidth, mount.clientHeight);
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
@@ -80,7 +86,6 @@ function Model() {
     const resizeObserver = new ResizeObserver(handleResize);
     resizeObserver.observe(mount);
 
-    // render continuously for 3s to catch the robot loading, then on-demand
     const loadDeadline = Date.now() + 3000;
     let animFrameId;
     const animate = () => {
@@ -100,22 +105,30 @@ function Model() {
         mount.removeChild(renderer.domElement);
       robotRef.current = null;
       rendererRef.current = null;
+      cameraRef.current = null;
+      sceneRef.current = null;
     };
   }, []);
 
-  // joint update — fires when ROS data arrivess
+  // Fires on every slider drag and on ROS feedback
   useEffect(() => {
     if (!jointPositions || !robotRef.current) return;
+
     Object.entries(JOINT_MAP).forEach(([name, index]) => {
       const angle = jointPositions[index];
       if (angle === undefined) return;
       robotRef.current.setJointValue(name, angle);
     });
-    needsRenderRef.current = true;
+
+    // Render immediately — don't wait for the next RAF tick
+    if (rendererRef.current && cameraRef.current && sceneRef.current) {
+      rendererRef.current.render(sceneRef.current, cameraRef.current);
+    }
+    needsRenderRef.current = false;
   }, [jointPositions]);
 
   return (
-    <div className="flex justify-center h-full text-foreground p-2 flex-col">
+    <div className="flex justify-center h-full flex-col">
       <Card className="w-full h-full p-0 overflow-hidden">
         <div ref={mountRef} className="w-full h-full min-h-0" />
       </Card>
