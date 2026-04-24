@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 
 const SEND_COOLDOWN_MS = 6000;
 const notify = () => toast.success("Position sent");
+const errorMsg = () => toast.error("Too many inputs. Please wait.");
 
 function MoveRobot() {
   const initialJointValues = {
@@ -83,9 +84,11 @@ function MoveRobot() {
         position: [...position],
         timeRequested: Date.now(),
       });
+      notify();
+    } else {
+      errorMsg();
     }
     if (!sendingRef.current) sendNext();
-    notify();
   }
   return (
     <div className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] h-dvh w-full overflow-hidden">
