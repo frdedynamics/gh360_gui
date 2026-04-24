@@ -1,90 +1,77 @@
 import { create } from "zustand";
 import * as ROSLIB from "roslib";
 
-const FPS = 10;
-const FRAME_TIME = 1000 / FPS;
-
-let latestJoint = null;
-let latestMotor = null;
-let intervalId = null;
-
 const useRosStore = create((set, get) => ({
   ros: null,
   status: "disconnected",
   intentionalDisconnect: false,
-
   jointPositions: null,
-  motorStates: null,
+
+  jointMessage: null,
+  motorMessage: null,
 
   jointTopic: null,
   motorTopic: null,
 
-  startRenderLoop: () => {
-    if (intervalId) return;
-
-    intervalId = setInterval(() => {
-      if (!latestJoint && !latestMotor) return;
-
-      set({
-        jointPositions: latestJoint?.position ?? null,
-        motorStates: latestMotor?.motors ?? null,
-      });
-    }, FRAME_TIME);
-  },
-
-  stopRenderLoop: () => {
-    if (intervalId) {
-      clearInterval(intervalId);
-      intervalId = null;
-    }
-  },
+  jointPublisher: null,
 
   subscribeToTopics: () => {
     const ros = get().ros;
     if (!ros) return;
 
+    // Prevent duplicate subscriptions
     get().unsubscribeFromTopics();
 
     const jointTopic = new ROSLIB.Topic({
       ros,
       name: "/gh360/joint_states",
       messageType: "sensor_msgs/msg/JointState",
+      throttle_rate: 100,
     });
 
     const motorTopic = new ROSLIB.Topic({
       ros,
       name: "/gh360/motor_states_sorted",
       messageType: "gh360_interfaces/msg/PortStatus",
+      throttle_rate: 100,
     });
 
-    jointTopic.subscribe((msg) => {
-      latestJoint = msg;
-    });
-
-    motorTopic.subscribe((msg) => {
-      latestMotor = msg;
-    });
+    jointTopic.subscribe((msg) => set({ jointMessage: msg }));
+    motorTopic.subscribe((msg) => set({ motorMessage: msg }));
 
     set({ jointTopic, motorTopic });
-    get().startRenderLoop();
+  },
+
+  publishJointMessage: (payload) => {
+    const ros = get().ros;
+    if (!ros) {
+      console.warn("ROS not connected — cannot publish joint message");
+      return;
+    }
+
+    let jointPub = get().jointPublisher;
+    if (!jointPub) {
+      jointPub = new ROSLIB.Topic({
+        ros,
+        name: "/gh360/joint_states",
+        messageType: "sensor_msgs/msg/JointState",
+      });
+      set({ jointPublisher: jointPub });
+    }
+    jointPub.publish(payload);
   },
 
   unsubscribeFromTopics: () => {
-    const { jointTopic, motorTopic } = get();
+    const { jointTopic, motorTopic, jointPublisher } = get();
 
     jointTopic?.unsubscribe();
     motorTopic?.unsubscribe();
 
-    get().stopRenderLoop();
-
-    latestJoint = null;
-    latestMotor = null;
-
+    jointPublisher?.unadvertise?.();
     set({
       jointTopic: null,
       motorTopic: null,
-      jointPositions: null,
-      motorStates: null,
+      jointPublisher: null,
     });
   },
 
@@ -110,6 +97,8 @@ const useRosStore = create((set, get) => ({
       set({
         status: "disconnected",
         ros: null,
+        jointMessage: null,
+        motorMessage: null,
       });
 
       if (!get().intentionalDisconnect) {
@@ -128,6 +117,7 @@ const useRosStore = create((set, get) => ({
   reconnect: () => {
     const ros = get().ros;
 
+    // force intentional disconnect
     set({ intentionalDisconnect: true });
 
     if (ros) {

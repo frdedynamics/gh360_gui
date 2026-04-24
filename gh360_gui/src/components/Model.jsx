@@ -115,7 +115,7 @@ function Model() {
   }, [jointPositions]);
 
   return (
-    <div className="flex justify-center h-full text-foreground p-2 flex-col">
+    <div className="flex justify-center h-full text-foreground  flex-col">
       <Card className="w-full h-full p-0 overflow-hidden">
         <div ref={mountRef} className="w-full h-full min-h-0" />
       </Card>
