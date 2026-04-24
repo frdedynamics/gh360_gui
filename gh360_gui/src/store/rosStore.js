@@ -5,21 +5,18 @@ const useRosStore = create((set, get) => ({
   ros: null,
   status: "disconnected",
   intentionalDisconnect: false,
-  jointPositions: null,
-
   jointMessage: null,
   motorMessage: null,
-
   jointTopic: null,
   motorTopic: null,
-
   jointPublisher: null,
+  jointPositions: null,
+
+  setJointPositions: (positions) => set({ jointPositions: positions }),
 
   subscribeToTopics: () => {
     const ros = get().ros;
     if (!ros) return;
-
-    // Prevent duplicate subscriptions
     get().unsubscribeFromTopics();
 
     const jointTopic = new ROSLIB.Topic({
@@ -36,9 +33,14 @@ const useRosStore = create((set, get) => ({
       throttle_rate: 100,
     });
 
-    jointTopic.subscribe((msg) => set({ jointMessage: msg }));
-    motorTopic.subscribe((msg) => set({ motorMessage: msg }));
+    jointTopic.subscribe((msg) =>
+      set({
+        jointMessage: msg,
+        jointPositions: msg.position,
+      }),
+    );
 
+    motorTopic.subscribe((msg) => set({ motorMessage: msg }));
     set({ jointTopic, motorTopic });
   },
 
@@ -48,7 +50,6 @@ const useRosStore = create((set, get) => ({
       console.warn("ROS not connected — cannot publish joint message");
       return;
     }
-
     let jointPub = get().jointPublisher;
     if (!jointPub) {
       jointPub = new ROSLIB.Topic({
@@ -63,10 +64,8 @@ const useRosStore = create((set, get) => ({
 
   unsubscribeFromTopics: () => {
     const { jointTopic, motorTopic, jointPublisher } = get();
-
     jointTopic?.unsubscribe();
     motorTopic?.unsubscribe();
-
     jointPublisher?.unadvertise?.();
     set({
       jointTopic: null,
@@ -77,9 +76,7 @@ const useRosStore = create((set, get) => ({
 
   connect: () => {
     const url = import.meta.env.VITE_ROSBRIDGE_SERVER || "ws://localhost:9090";
-
     set({ status: "connecting", intentionalDisconnect: false });
-
     const ros = new ROSLIB.Ros({ url });
 
     ros.on("connection", () => {
@@ -93,14 +90,13 @@ const useRosStore = create((set, get) => ({
 
     ros.on("close", () => {
       get().unsubscribeFromTopics();
-
       set({
         status: "disconnected",
         ros: null,
         jointMessage: null,
         motorMessage: null,
+        jointPositions: null,
       });
-
       if (!get().intentionalDisconnect) {
         setTimeout(() => get().connect(), 2000);
       }
@@ -109,24 +105,18 @@ const useRosStore = create((set, get) => ({
 
   disconnect: () => {
     set({ intentionalDisconnect: true });
-
     get().unsubscribeFromTopics();
     get().ros?.close();
   },
 
   reconnect: () => {
     const ros = get().ros;
-
-    // force intentional disconnect
     set({ intentionalDisconnect: true });
-
     if (ros) {
       get().unsubscribeFromTopics();
-
       ros.once("close", () => {
         get().connect();
       });
-
       ros.close();
     } else {
       get().connect();
