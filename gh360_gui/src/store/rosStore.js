@@ -11,6 +11,7 @@ const useRosStore = create((set, get) => ({
   motorTopic: null,
   jointPublisher: null,
   jointPositions: null,
+  motorStates: null,
 
   setJointPositions: (positions) => set({ jointPositions: positions }),
 
@@ -33,14 +34,15 @@ const useRosStore = create((set, get) => ({
       throttle_rate: 100,
     });
 
-    jointTopic.subscribe((msg) =>
-      set({
-        jointMessage: msg,
-        jointPositions: msg.position,
-      }),
-    );
+    jointTopic.subscribe((msg) => {
+      set({ jointMessage: msg, jointPositions: msg.position });
+    });
 
-    motorTopic.subscribe((msg) => set({ motorMessage: msg }));
+    motorTopic.subscribe((msg) => {
+      const states = msg.motors ?? msg.ports ?? msg;
+      set({ motorMessage: msg, motorStates: states });
+    });
+
     set({ jointTopic, motorTopic });
   },
 
@@ -67,11 +69,7 @@ const useRosStore = create((set, get) => ({
     jointTopic?.unsubscribe();
     motorTopic?.unsubscribe();
     jointPublisher?.unadvertise?.();
-    set({
-      jointTopic: null,
-      motorTopic: null,
-      jointPublisher: null,
-    });
+    set({ jointTopic: null, motorTopic: null, jointPublisher: null });
   },
 
   connect: () => {
@@ -96,6 +94,7 @@ const useRosStore = create((set, get) => ({
         jointMessage: null,
         motorMessage: null,
         jointPositions: null,
+        motorStates: null,
       });
       if (!get().intentionalDisconnect) {
         setTimeout(() => get().connect(), 2000);
@@ -114,9 +113,7 @@ const useRosStore = create((set, get) => ({
     set({ intentionalDisconnect: true });
     if (ros) {
       get().unsubscribeFromTopics();
-      ros.once("close", () => {
-        get().connect();
-      });
+      ros.once("close", () => get().connect());
       ros.close();
     } else {
       get().connect();
