@@ -7,6 +7,7 @@ import { ThemeProvider } from "./components/ui/themeProvider";
 import MoveRobot from "./pages/MoveRobot";
 import BlockProgramming from "./pages/BlockProgramming";
 import InstructionPage from "./pages/InstructionPage";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const { connect } = useRosStore();
@@ -18,6 +19,7 @@ function App() {
   return (
     // Routing setup, with BrowserRouter.
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      <Toaster />
       <BrowserRouter>
         <Routes>
           {/* Applayout as parent component (sidebar + page) with <Outlet> as children component of the applayout */}
@@ -25,7 +27,7 @@ function App() {
             <Route index path="" element={<Dashboard />} />
             <Route path="moverobot" element={<MoveRobot />} />
             <Route path="block_programming" element={<BlockProgramming />} />
-            <Route path="instruction_page" element={<InstructionPage />} /> 
+            <Route path="instruction_page" element={<InstructionPage />} />
           </Route>
         </Routes>
       </BrowserRouter>

@@ -11,8 +11,10 @@ import {
 import { JOINT_CONFIG, JOINT_LIMITS, DEG_TO_RAD } from "@/configs/jointConfigs";
 import useRosStore from "@/store/rosStore";
 import { useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 
 const SEND_COOLDOWN_MS = 6000;
+const notify = () => toast.success("Position sent");
 
 function MoveRobot() {
   const initialJointValues = {
@@ -83,15 +85,15 @@ function MoveRobot() {
       });
     }
     if (!sendingRef.current) sendNext();
+    notify();
   }
-
   return (
     <div className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] h-dvh w-full overflow-hidden">
       {/* Sliders side */}
       <Card className="flex flex-col overflow-hidden m-2 sm:m-2 md:m-2 lg:m-3 xl:m-3 2xl:m-4">
         <CardHeader className="shrink-0">
           <CardTitle className="  sm:text-base md:text-base lg:text-lg xl:text-xl 2xl:text-2xl underline decoration-2 underline-offset-4 sm:underline-offset-4 md:underline-offset-4 lg:underline-offset-6 xl:underline-offset-6 2xl:underline-offset-6">
-            Move robot joints
+            Move Robot Joints
           </CardTitle>
           <div className="flex gap-2 mt-1  p-2">
             {["radians", "degrees"].map((u) => (
@@ -100,7 +102,7 @@ function MoveRobot() {
                 size="sm"
                 variant={angleUnit === u ? "default" : "outline"}
                 onClick={() => setAngleUnit(u)}
-                className="sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base"
+                className="sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
               >
                 {u}
               </Button>
@@ -124,7 +126,8 @@ function MoveRobot() {
         <CardFooter className="shrink-0 p-3 sm:p-3 md:p-3 lg:p-4 xl:p-4 2xl:p-5">
           <Button
             onClick={enqueueSend}
-            className="w-full sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base"
+            className="w-full sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
+            title="Send positions"
           >
             Send Goal
           </Button>
