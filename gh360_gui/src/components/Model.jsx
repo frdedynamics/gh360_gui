@@ -15,15 +15,17 @@ const JOINT_MAP = {
   wrist_pitch: 6,
 };
 
-function Model() {
+function Model({ ghost }) {
   const mountRef = useRef(null);
   const robotRef = useRef(null);
+  const ghostRobotRef = useRef(null);
   const rendererRef = useRef(null);
   const cameraRef = useRef(null);
   const sceneRef = useRef(null);
   const needsRenderRef = useRef(true);
 
   const jointPositions = useRosStore((s) => s.jointPositions);
+  const msgJointPositions = useRosStore((s) => s.msgJointPositions);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -66,17 +68,22 @@ function Model() {
     const loader = new URDFLoader();
     loader.packages = { gh360: "/gh360-threejs-model" };
     loader.load("/gh360-threejs-model/urdf/gh360.urdf", (robot) => {
-      robot.traverse((child) => {
-        if (child.isMesh) {
-          child.material = new THREE.MeshStandardMaterial({ color: 0x888888 });
-        }
-      });
       scene.add(robot);
       robotRef.current = robot;
       needsRenderRef.current = true;
     });
+      if (ghost) {
+          loader.load("/gh360-threejs-model/urdf/gh360_ghost.urdf", (ghostRobot) => {
+              // tiny scale to avoid z-fighting
+              ghostRobot.scale.set(1.0001, 1.0001, 1.0001);
+              scene.add(ghostRobot);
+              ghostRobotRef.current = ghostRobot;
+              needsRenderRef.current = true;
+          });
+      }
 
-    const handleResize = () => {
+
+      const handleResize = () => {
       if (!mount) return;
       camera.aspect = mount.clientWidth / mount.clientHeight;
       camera.updateProjectionMatrix();
@@ -110,14 +117,14 @@ function Model() {
     };
   }, []);
 
-  // Fires on every slider drag and on ROS feedback
+  // Fires on every slider
   useEffect(() => {
-    if (!jointPositions || !robotRef.current) return;
+    if (!jointPositions || !ghostRobotRef.current) return;
 
     Object.entries(JOINT_MAP).forEach(([name, index]) => {
       const angle = jointPositions[index];
       if (angle === undefined) return;
-      robotRef.current.setJointValue(name, angle);
+      ghostRobotRef.current.setJointValue(name, angle);
     });
 
     // Render immediately — don't wait for the next RAF tick
@@ -126,6 +133,23 @@ function Model() {
     }
     needsRenderRef.current = false;
   }, [jointPositions]);
+
+  // fires on ROS feedback
+  useEffect(() => {
+  if (!msgJointPositions || !robotRef.current) return;
+
+  Object.entries(JOINT_MAP).forEach(([name, index]) => {
+      const angle = msgJointPositions[index];
+      if (angle === undefined) return;
+      robotRef.current.setJointValue(name, angle);
+  });
+
+    // Render immediately — don't wait for the next RAF tick
+    if (rendererRef.current && cameraRef.current && sceneRef.current) {
+        rendererRef.current.render(sceneRef.current, cameraRef.current);
+    }
+    needsRenderRef.current = false;
+}, [msgJointPositions]);
 
   return (
     <div className="flex justify-center h-full flex-col">

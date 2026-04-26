@@ -11,6 +11,7 @@ const useRosStore = create((set, get) => ({
   motorTopic: null,
   jointPublisher: null,
   jointPositions: null,
+  msgJointPositions: null,
   motorStates: null,
 
   setJointPositions: (positions) => set({ jointPositions: positions }),
@@ -35,7 +36,7 @@ const useRosStore = create((set, get) => ({
     });
 
     jointTopic.subscribe((msg) => {
-      set({ jointMessage: msg, jointPositions: msg.position });
+      set({ jointMessage: msg, msgJointPositions: msg.position });
     });
 
     motorTopic.subscribe((msg) => {
@@ -94,6 +95,7 @@ const useRosStore = create((set, get) => ({
         jointMessage: null,
         motorMessage: null,
         jointPositions: null,
+        msgJointPositions: null,
         motorStates: null,
       });
       if (!get().intentionalDisconnect) {

@@ -2,23 +2,23 @@
 <robot name="multipleshapes">
 
     <material name="blue">
-        <color rgba="0 0.05 0.8 1"/>
+        <color rgba="0 0.05 0.8 0.2"/>
     </material>
     <material name="light_blue">
-        <color rgba="0.0 0.2 0.7 1"/>
+        <color rgba="0.0 0.2 0.7 0.2"/>
     </material>
     <material name="gray">
-        <color rgba="0.2 0.2 0.2 1"/>
+        <color rgba="0.2 0.2 0.2 0.2"/>
     </material>
     <material name="dark_gray">
-            <color rgba="0.1 0.1 0.1 1"/>
+            <color rgba="0.1 0.1 0.1 0.2"/>
     </material>
     <material name="black">
-            <color rgba="0.05 0.05 0.05 1"/>
+            <color rgba="0.05 0.05 0.05 0.2"/>
     </material>
 
     <link name="base_link" />
-    
+
     <joint name="base_joint" type="fixed">
         <parent link="base_link"/>
         <child link="shoulder0"/>

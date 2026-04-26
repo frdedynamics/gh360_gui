@@ -139,7 +139,7 @@ function MoveRobot() {
 
       {/* Model side */}
       <div className="hidden sm:block p-2 sm:p-2 md:p-2 lg:p-3 xl:p-3 2xl:p-4 h-full overflow-hidden">
-        <Model />
+        <Model ghost={true} />
       </div>
     </div>
   );
