@@ -28,15 +28,11 @@ function Navbar({ setOpenNavbar }) {
       icon: <Code />,
       navlink: <NavLink to="/block_programming">Block Programming</NavLink>,
     },
-    {
-      icon: <FileQuestionMark />,
-      navlink: <NavLink to="instruction_page"> Instructions</NavLink>,
-    },
   ];
 
   return (
     <nav className="flex flex-col h-full w-full relative">
-      <div className="text-xl items-center justify-center font-semibold p-2 sm:text-2xl sm:p-3 md:text-2xl md:p-3 lg:text-3xl lg:p-4 xl:text-2xl xl:p-5 2xl:text-5xl 2xl:p-6">
+      <div className="text-xl items-center justify-center font-semibold p-2 sm:text-2xl sm:p-3 md:text-2xl md:p-3 lg:text-3xl lg:p-4 xl:text-2xl xl:p-5 2xl:text-3xl 2xl:p-6">
         <p>GH360</p> Robot Arm
       </div>
 
