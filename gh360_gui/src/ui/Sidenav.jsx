@@ -4,7 +4,6 @@ import useRosStore from "@/store/rosStore";
 import {
   BotMessageSquare,
   Code,
-  FileQuestionMark,
   LayoutDashboard,
   PanelLeftClose,
   Power,

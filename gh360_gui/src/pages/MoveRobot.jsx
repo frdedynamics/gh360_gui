@@ -31,12 +31,21 @@ function MoveRobot() {
   const sendingRef = useRef(false);
   const cooldownTimerRef = useRef(null);
 
-  const publishJointMessage = useRosStore((s) => s.publishJointMessage);
+  const publishCmdJointPos = useRosStore((s) => s.publishCmdJointPos);
   const setJointPositions = useRosStore((s) => s.setJointPositions);
 
   useEffect(() => {
     jointValuesRef.current = jointValues;
   }, [jointValues]);
+
+  // Clear cooldown timer on unmount to avoid memory leaks
+  useEffect(() => {
+    return () => {
+      if (cooldownTimerRef.current) {
+        clearTimeout(cooldownTimerRef.current);
+      }
+    };
+  }, []);
 
   function handleSliderChange(jointName, displayVal) {
     const isRad = angleUnit === "radians";
@@ -65,7 +74,10 @@ function MoveRobot() {
       return;
     }
     sendingRef.current = true;
-    publishJointMessage({ name: item.name, position: item.position });
+
+    // Publish as Float64MultiArray — just the flat position array
+    publishCmdJointPos(item.position);
+
     cooldownTimerRef.current = window.setTimeout(() => {
       cooldownTimerRef.current = null;
       if (sendQueueRef.current.length > 0) {
@@ -90,15 +102,16 @@ function MoveRobot() {
     }
     if (!sendingRef.current) sendNext();
   }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-[1fr_2fr] h-dvh w-full overflow-hidden">
       {/* Sliders side */}
       <Card className="flex flex-col overflow-hidden m-2 sm:m-2 md:m-2 lg:m-3 xl:m-3 2xl:m-4">
         <CardHeader className="shrink-0">
-          <CardTitle className="  sm:text-base md:text-base lg:text-lg xl:text-xl 2xl:text-2xl underline decoration-2 underline-offset-4 sm:underline-offset-4 md:underline-offset-4 lg:underline-offset-6 xl:underline-offset-6 2xl:underline-offset-6">
+          <CardTitle className="sm:text-base md:text-base lg:text-lg xl:text-xl 2xl:text-2xl underline decoration-2 underline-offset-4 sm:underline-offset-4 md:underline-offset-4 lg:underline-offset-6 xl:underline-offset-6 2xl:underline-offset-6">
             Move Robot Joints
           </CardTitle>
-          <div className="flex gap-2 mt-1  p-2">
+          <div className="flex gap-2 mt-1 p-2">
             {["radians", "degrees"].map((u) => (
               <Button
                 key={u}
