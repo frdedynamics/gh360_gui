@@ -11,7 +11,7 @@ import useRosStore from "@/store/rosStore";
 
 function JointCard({ jointName, index, motors, angleUnit }) {
   const [moreInfo, setMoreInfo] = useState(false);
-  const jointPositions = useRosStore((s) => s.jointPositions);
+  const jointPositions = useRosStore((s) => s.msgJointPositions);
   const motorStates = useRosStore((s) => s.motorStates);
 
   const jointAngle = jointPositions?.[index] ?? null;
