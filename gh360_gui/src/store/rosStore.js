@@ -10,6 +10,7 @@ const useRosStore = create((set, get) => ({
   jointTopic: null,
   motorTopic: null,
   jointPublisher: null,
+  cmdJointPosPub: null,
   jointPositions: null,
   msgJointPositions: null,
   motorStates: null,
@@ -47,30 +48,36 @@ const useRosStore = create((set, get) => ({
     set({ jointTopic, motorTopic });
   },
 
-  publishJointMessage: (payload) => {
+  publishCmdJointPos: (positions) => {
     const ros = get().ros;
     if (!ros) {
-      console.warn("ROS not connected — cannot publish joint message");
+      console.warn("ROS not connected — cannot publish joint command");
       return;
     }
-    let jointPub = get().jointPublisher;
-    if (!jointPub) {
-      jointPub = new ROSLIB.Topic({
+    let cmdPub = get().cmdJointPosPub;
+    if (!cmdPub) {
+      cmdPub = new ROSLIB.Topic({
         ros,
-        name: "/gh360/joint_states",
-        messageType: "sensor_msgs/msg/JointState",
+        name: "/gh360_control/cmd_joint_pos",
+        messageType: "std_msgs/msg/Float64MultiArray",
       });
-      set({ jointPublisher: jointPub });
+      set({ cmdJointPosPub: cmdPub });
     }
-    jointPub.publish(payload);
+    cmdPub.publish({ data: positions });
   },
 
   unsubscribeFromTopics: () => {
-    const { jointTopic, motorTopic, jointPublisher } = get();
+    const { jointTopic, motorTopic, jointPublisher, cmdJointPosPub } = get();
     jointTopic?.unsubscribe();
     motorTopic?.unsubscribe();
     jointPublisher?.unadvertise?.();
-    set({ jointTopic: null, motorTopic: null, jointPublisher: null });
+    cmdJointPosPub?.unadvertise?.();
+    set({
+      jointTopic: null,
+      motorTopic: null,
+      jointPublisher: null,
+      cmdJointPosPub: null,
+    });
   },
 
   connect: () => {
@@ -115,7 +122,10 @@ const useRosStore = create((set, get) => ({
     set({ intentionalDisconnect: true });
     if (ros) {
       get().unsubscribeFromTopics();
-      ros.once("close", () => get().connect());
+      ros.once("close", () => {
+        set({ intentionalDisconnect: false });
+        get().connect();
+      });
       ros.close();
     } else {
       get().connect();
