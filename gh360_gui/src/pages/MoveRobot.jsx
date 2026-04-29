@@ -12,10 +12,19 @@ import { JOINT_CONFIG, JOINT_LIMITS, DEG_TO_RAD } from "@/configs/jointConfigs";
 import useRosStore from "@/store/rosStore";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu.jsx";
+import {Input} from "@/components/ui/input.jsx";
 
 const SEND_COOLDOWN_MS = 6000;
 const notify = () => toast.success("Position sent");
+const saved = (name) => toast.success("Position saved with name: " + name);
 const errorMsg = () => toast.error("Too many inputs. Please wait.");
+const errorInput = () => toast.error("Please enter a name.");
 
 function MoveRobot() {
   const initialJointValues = {
@@ -30,9 +39,12 @@ function MoveRobot() {
   const sendQueueRef = useRef([]);
   const sendingRef = useRef(false);
   const cooldownTimerRef = useRef(null);
+  const nameInputRef = useRef(null);
 
   const publishCmdJointPos = useRosStore((s) => s.publishCmdJointPos);
   const setJointPositions = useRosStore((s) => s.setJointPositions);
+  const setSavedPosition = useRosStore((s) => s.setSavedPosition);
+  const savedPositions = useRosStore((s) => s.savedPositions);
 
   useEffect(() => {
     jointValuesRef.current = jointValues;
@@ -66,6 +78,21 @@ function MoveRobot() {
       return next;
     });
   }
+
+    function updateSavedPositions() {
+        const name = nameInputRef.current?.value.trim();
+        if (!name) {
+            errorInput();
+            return;
+        }
+
+        const position = jointValuesRef.current;
+        if (!position) {
+            return;
+        }
+        saved(name);
+        setSavedPosition(name, position);
+    }
 
   function sendNext() {
     const item = sendQueueRef.current.shift();
@@ -138,16 +165,38 @@ function MoveRobot() {
             />
           ))}
         </CardContent>
-
-        <CardFooter className="shrink-0 p-3 sm:p-3 md:p-3 lg:p-4 xl:p-4 2xl:p-5">
-          <Button
-            onClick={enqueueSend}
-            className="w-full sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
-            title="Send positions"
-          >
-            Send Goal
-          </Button>
-        </CardFooter>
+          <CardFooter className="shrink-0 p-3 sm:p-3 md:p-3 lg:p-4 xl:p-4 2xl:p-5">
+              <div className="flex flex-col gap-2 w-full">
+                  <div className="flex items-center gap-2">
+                      <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                              <Input type="text" className="w-24" ref={nameInputRef}/>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                              {savedPositions.map((item) => (
+                                  <DropdownMenuItem key={item.name}>
+                                      {item.name}
+                                  </DropdownMenuItem>
+                              ))}
+                          </DropdownMenuContent>
+                      </DropdownMenu>
+                      <Button
+                          onClick={updateSavedPositions}
+                          className="flex-1 sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer w-"
+                          title="Save position"
+                      >
+                          Save position
+                      </Button>
+                  </div>
+                  <Button
+                      onClick={enqueueSend}
+                      className="w-full sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
+                      title="Send positions"
+                  >
+                      Send Goal
+                  </Button>
+              </div>
+          </CardFooter>
       </Card>
 
       {/* Model side */}

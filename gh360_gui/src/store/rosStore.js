@@ -13,9 +13,31 @@ const useRosStore = create((set, get) => ({
   cmdJointPosPub: null,
   jointPositions: null,
   msgJointPositions: null,
+  savedPositions: [],
+  blockCode: null,
   motorStates: null,
 
+  setBlockCode: (code) => set({blockCode: code}),
   setJointPositions: (positions) => set({ jointPositions: positions }),
+  setSavedPosition: (name, position) =>
+        set((state) => {
+            // Looking for existing entry
+            const existingIndex = state.savedPositions.findIndex(
+                (item) => item.name === name
+            );
+
+            // Replace existing entry
+            if (existingIndex !== -1) {
+                const updated = [...state.savedPositions];
+                updated[existingIndex] = { name, position };
+                return { savedPositions: updated };
+            }
+
+            // Or add new entry if not found
+            return {
+                savedPositions: [...state.savedPositions, { name, position }],
+            };
+        }),
 
   subscribeToTopics: () => {
     const ros = get().ros;
