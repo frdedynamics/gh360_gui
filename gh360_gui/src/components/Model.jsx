@@ -119,12 +119,12 @@ function Model({ ghost }) {
 
   // Fires on every slider
   useEffect(() => {
-    if (!jointPositions || !ghostRobotRef.current) return;
+    if (!jointPositions || !ghost || !robotRef.current) return;
 
     Object.entries(JOINT_MAP).forEach(([name, index]) => {
       const angle = jointPositions[index];
       if (angle === undefined) return;
-      ghostRobotRef.current.setJointValue(name, angle);
+      robotRef.current.setJointValue(name, angle);
     });
 
     // Render immediately — don't wait for the next RAF tick
@@ -136,12 +136,15 @@ function Model({ ghost }) {
 
   // fires on ROS feedback
   useEffect(() => {
-  if (!msgJointPositions || !robotRef.current) return;
+  if (!msgJointPositions) return;
+
+  const targetRobot = ghost ? ghostRobotRef.current : robotRef.current;
+  if (!targetRobot) return;
 
   Object.entries(JOINT_MAP).forEach(([name, index]) => {
       const angle = msgJointPositions[index];
       if (angle === undefined) return;
-      robotRef.current.setJointValue(name, angle);
+      targetRobot.setJointValue(name, angle);
   });
 
     // Render immediately — don't wait for the next RAF tick
