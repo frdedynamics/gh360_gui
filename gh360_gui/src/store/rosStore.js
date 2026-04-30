@@ -106,8 +106,8 @@ const useRosStore = create((set, get) => ({
       const target = nextTarget.slice();
 
       const maxDurationMs = 30000;// total time allowed per goal (ms)
-      const intervalMs = 100;     // send/check interval (ms)
-      const epsilon = 0.01;       // “close enough” tolerance
+      const intervalMs = 10;     // send/check interval (ms)
+      const epsilon = 1;       // “close enough” tolerance
 
       const startTime = Date.now();
 
