@@ -12,10 +12,16 @@ import { JOINT_CONFIG, JOINT_LIMITS, DEG_TO_RAD } from "@/configs/jointConfigs";
 import useRosStore from "@/store/rosStore";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import CustomInput from "../components/CustomInput";
 
+// Cooldown for sending goal positions
 const SEND_COOLDOWN_MS = 6000;
+
+// Notifications
 const notify = () => toast.success("Position sent");
+const saved = (name) => toast.success("Position saved with name: " + name);
 const errorMsg = () => toast.error("Too many inputs. Please wait.");
+const errorInput = () => toast.error("Please enter a name.");
 
 function MoveRobot() {
   const initialJointValues = {
@@ -30,9 +36,14 @@ function MoveRobot() {
   const sendQueueRef = useRef([]);
   const sendingRef = useRef(false);
   const cooldownTimerRef = useRef(null);
+  const nameInputRef = useRef(null);
+  const userTouchedSlidersRef = useRef(false);
 
   const publishCmdJointPos = useRosStore((s) => s.publishCmdJointPos);
   const setJointPositions = useRosStore((s) => s.setJointPositions);
+  const setSavedPosition = useRosStore((s) => s.setSavedPosition);
+  const savedPositions = useRosStore((s) => s.savedPositions);
+  const msgJointPositions = useRosStore((s) => s.msgJointPositions);
 
   useEffect(() => {
     jointValuesRef.current = jointValues;
@@ -47,10 +58,26 @@ function MoveRobot() {
     };
   }, []);
 
+    useEffect(() => {
+        if (!msgJointPositions || !msgJointPositions.length) return;
+        if (userTouchedSlidersRef.current) return;
+
+        setJointValues((prev) => {
+            const nextPositions = [...msgJointPositions];
+            const next = { ...prev, position: nextPositions };
+
+            jointValuesRef.current = next;
+            setJointPositions(nextPositions); // keep store in sync (for Model)
+
+            return next;
+        });
+    }, [msgJointPositions, setJointPositions]);
+
   function handleSliderChange(jointName, displayVal) {
     const isRad = angleUnit === "radians";
     let val = isRad ? Number(displayVal) : DEG_TO_RAD(Number(displayVal));
     if (Number.isNaN(val)) return;
+    userTouchedSlidersRef.current = true;
 
     const limits = JOINT_LIMITS[jointName];
     val = Math.max(limits.lower, Math.min(limits.upper, val));
@@ -66,6 +93,21 @@ function MoveRobot() {
       return next;
     });
   }
+
+    function updateSavedPositions() {
+        const name = nameInputRef.current?.value.trim();
+        if (!name) {
+            errorInput();
+            return;
+        }
+
+        const position = jointValuesRef.current;
+        if (!position) {
+            return;
+        }
+        saved(name);
+        setSavedPosition(name, position);
+    }
 
   function sendNext() {
     const item = sendQueueRef.current.shift();
@@ -138,16 +180,30 @@ function MoveRobot() {
             />
           ))}
         </CardContent>
-
-        <CardFooter className="shrink-0 p-3 sm:p-3 md:p-3 lg:p-4 xl:p-4 2xl:p-5">
-          <Button
-            onClick={enqueueSend}
-            className="w-full sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
-            title="Send positions"
-          >
-            Send Goal
-          </Button>
-        </CardFooter>
+          <CardFooter className="shrink-0 p-3 sm:p-3 md:p-3 lg:p-4 xl:p-4 2xl:p-5">
+              <div className="flex flex-col gap-2 w-full">
+                  <div className="flex items-center gap-2">
+                      <CustomInput
+                          savedPositions={savedPositions}
+                          nameInputRef={nameInputRef}
+                      />
+                      <Button
+                          onClick={updateSavedPositions}
+                          className="flex-1 sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer w-"
+                          title="Save position"
+                      >
+                          Save position
+                      </Button>
+                  </div>
+                  <Button
+                      onClick={enqueueSend}
+                      className="w-full sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
+                      title="Send positions"
+                  >
+                      Send Goal
+                  </Button>
+              </div>
+          </CardFooter>
       </Card>
 
       {/* Model side */}

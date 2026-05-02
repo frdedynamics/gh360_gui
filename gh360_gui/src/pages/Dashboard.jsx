@@ -8,10 +8,19 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { JOINT_CONFIG } from "@/configs/jointConfigs";
 import { Video, VideoOff } from "lucide-react";
 import { useState } from "react";
+import useRosStore from "@/store/rosStore.js";
 
 function Dashboard() {
   const [toggleCamera, setToggleCamera] = useState(false);
   const [angleUnit, setAngleUnit] = useState("radians");
+
+  const code = useRosStore((s) => s.blockCode);
+  const publishCmdJointPos = useRosStore((s) => s.publishCmdJointPos);
+
+  function runCode() {
+      console.log(code);
+      eval(code);
+  }
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] h-dvh w-full overflow-hidden">
@@ -57,6 +66,9 @@ function Dashboard() {
                   </Label>
                 </div>
               </RadioGroup>
+              <Button className={code ? "flex-1" : "hidden"} onClick={runCode}>
+                  Play saved code
+              </Button>
             </CardContent>
           </Card>
 
