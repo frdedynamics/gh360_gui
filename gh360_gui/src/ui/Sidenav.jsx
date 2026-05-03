@@ -13,10 +13,15 @@ import { useState } from "react";
 import { NavLink } from "react-router-dom";
 
 function Navbar({ setOpenNavbar }) {
+  // Fetching the different status connections from the rosStore.
   const { status, disconnect, reconnect } = useRosStore();
   const isConnected = status === "connected";
+  const isConnecting = status === "connecting";
+
+  //Reconnect cooldown, so you can not spam the reconnect button.
   const [reconnectCooldown, setReconnectCooldown] = useState(false);
 
+  // List of all the pages.
   const navbarOptions = [
     { icon: <LayoutDashboard />, navlink: <NavLink to="/">Dashboard</NavLink> },
     {
@@ -65,19 +70,31 @@ function Navbar({ setOpenNavbar }) {
           <div className="relative flex h-2 w-2 2xl:scale-125">
             <span
               className={`inline-flex h-full w-full rounded-full opacity-75 ${
-                isConnected ? "bg-green-400 animate-ping absolute" : ""
+                isConnected
+                  ? "bg-green-400 animate-ping absolute"
+                  : isConnecting
+                    ? "bg-yellow-400 animate-ping absolute"
+                    : ""
               }`}
             />
             <span
               className={`relative inline-flex h-2 w-40 rounded-full ${
-                isConnected ? "bg-green-500" : "bg-red-500"
+                isConnected
+                  ? "bg-green-500"
+                  : isConnecting
+                    ? "bg-yellow-500"
+                    : "bg-red-500"
               }`}
             />
           </div>
-
+          {/* Different colors based on the connection status.  */}
           <p
             className={`capitalize text-sm font-medium sm:text-sm md:text-base lg:text-lg xl:text-lg 2xl:text-2xl ${
-              isConnected ? "text-green-500" : "text-red-500"
+              isConnected
+                ? "text-green-500"
+                : isConnecting
+                  ? "text-yellow-500"
+                  : "text-red-500"
             }`}
           >
             {status}

@@ -7,7 +7,7 @@ function Applayout() {
   const [openNavbar, setOpenNavbar] = useState(true);
 
   return (
-    //  Create a page layout that is divided in two columns.
+    //  Create a page layout that is divided in two columns. Sidebar to the left, and outlet displayed as the different pages.
     <div
       className={`grid h-dvh  ${
         openNavbar

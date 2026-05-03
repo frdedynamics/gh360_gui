@@ -49,6 +49,10 @@ function MoveRobot() {
     jointValuesRef.current = jointValues;
   }, [jointValues]);
 
+  useEffect(() => {
+    document.title = "GH360 Move Robot";
+  }, []);
+
   // Clear cooldown timer on unmount to avoid memory leaks
   useEffect(() => {
     return () => {
@@ -58,20 +62,20 @@ function MoveRobot() {
     };
   }, []);
 
-    useEffect(() => {
-        if (!msgJointPositions || !msgJointPositions.length) return;
-        if (userTouchedSlidersRef.current) return;
+  useEffect(() => {
+    if (!msgJointPositions || !msgJointPositions.length) return;
+    if (userTouchedSlidersRef.current) return;
 
-        setJointValues((prev) => {
-            const nextPositions = [...msgJointPositions];
-            const next = { ...prev, position: nextPositions };
+    setJointValues((prev) => {
+      const nextPositions = [...msgJointPositions];
+      const next = { ...prev, position: nextPositions };
 
-            jointValuesRef.current = next;
-            setJointPositions(nextPositions); // keep store in sync (for Model)
+      jointValuesRef.current = next;
+      setJointPositions(nextPositions); // keep store in sync (for Model)
 
-            return next;
-        });
-    }, [msgJointPositions, setJointPositions]);
+      return next;
+    });
+  }, [msgJointPositions, setJointPositions]);
 
   function handleSliderChange(jointName, displayVal) {
     const isRad = angleUnit === "radians";
@@ -94,20 +98,20 @@ function MoveRobot() {
     });
   }
 
-    function updateSavedPositions() {
-        const name = nameInputRef.current?.value.trim();
-        if (!name) {
-            errorInput();
-            return;
-        }
-
-        const position = jointValuesRef.current;
-        if (!position) {
-            return;
-        }
-        saved(name);
-        setSavedPosition(name, position);
+  function updateSavedPositions() {
+    const name = nameInputRef.current?.value.trim();
+    if (!name) {
+      errorInput();
+      return;
     }
+
+    const position = jointValuesRef.current;
+    if (!position) {
+      return;
+    }
+    saved(name);
+    setSavedPosition(name, position);
+  }
 
   function sendNext() {
     const item = sendQueueRef.current.shift();
@@ -180,30 +184,30 @@ function MoveRobot() {
             />
           ))}
         </CardContent>
-          <CardFooter className="shrink-0 p-3 sm:p-3 md:p-3 lg:p-4 xl:p-4 2xl:p-5">
-              <div className="flex flex-col gap-2 w-full">
-                  <div className="flex items-center gap-2">
-                      <CustomInput
-                          savedPositions={savedPositions}
-                          nameInputRef={nameInputRef}
-                      />
-                      <Button
-                          onClick={updateSavedPositions}
-                          className="flex-1 sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer w-"
-                          title="Save position"
-                      >
-                          Save position
-                      </Button>
-                  </div>
-                  <Button
-                      onClick={enqueueSend}
-                      className="w-full sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
-                      title="Send positions"
-                  >
-                      Send Goal
-                  </Button>
-              </div>
-          </CardFooter>
+        <CardFooter className="shrink-0 p-3 sm:p-3 md:p-3 lg:p-4 xl:p-4 2xl:p-5">
+          <div className="flex flex-col gap-2 w-full">
+            <div className="flex items-center gap-2">
+              <CustomInput
+                savedPositions={savedPositions}
+                nameInputRef={nameInputRef}
+              />
+              <Button
+                onClick={updateSavedPositions}
+                className="flex-1 sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer w-"
+                title="Save position"
+              >
+                Save position
+              </Button>
+            </div>
+            <Button
+              onClick={enqueueSend}
+              className="w-full sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
+              title="Send positions"
+            >
+              Send Goal
+            </Button>
+          </div>
+        </CardFooter>
       </Card>
 
       {/* Model side */}
