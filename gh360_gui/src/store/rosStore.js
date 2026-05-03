@@ -3,15 +3,15 @@ import * as ROSLIB from "roslib";
 
 // Helper function for deciding if robot is close enough to its goal.
 function isCloseEnough(target, current, epsilon) {
-    if (!Array.isArray(target) || !Array.isArray(current)) return false;
-    if (current.length !== target.length) return false;
+  if (!Array.isArray(target) || !Array.isArray(current)) return false;
+  if (current.length !== target.length) return false;
 
-    for (let i = 0; i < target.length; i++) {
-        if (Math.abs(target[i] - current[i]) > epsilon) {
-            return false;
-        }
+  for (let i = 0; i < target.length; i++) {
+    if (Math.abs(target[i] - current[i]) > epsilon) {
+      return false;
     }
-    return true;
+  }
+  return true;
 }
 
 const useRosStore = create((set, get) => ({
@@ -47,114 +47,114 @@ const useRosStore = create((set, get) => ({
   isProcessingJointQueue: false,
 
   // Setter for setting the code for block programming
-  setBlockCode: (code) => set({blockCode: code}),
+  setBlockCode: (code) => set({ blockCode: code }),
   // Setter for setting the positions the sliders point to in MoveRobot.
   setJointPositions: (positions) => set({ jointPositions: positions }),
   // Setter for either updating the position of a stored item with a given name,
   // or adding a new item with the given name and position.
   setSavedPosition: (name, position) =>
-      set((state) => {
+    set((state) => {
       // Looking for existing entry
       const existingIndex = state.savedPositions.findIndex(
-          (item) => item.name === name
+        (item) => item.name === name,
       );
 
       // Replace existing entry
       if (existingIndex !== -1) {
-          const updated = [...state.savedPositions];
-          updated[existingIndex] = { name, position };
-          return { savedPositions: updated };
+        const updated = [...state.savedPositions];
+        updated[existingIndex] = { name, position };
+        return { savedPositions: updated };
       }
 
       // Or add new entry if not found
       return {
-          savedPositions: [...state.savedPositions, { name, position }],
+        savedPositions: [...state.savedPositions, { name, position }],
       };
-  }),
+    }),
 
   _processJointQueue: () => {
-      const state = get();
-      const { ros, jointGoalQueue } = state;
+    const state = get();
+    const { ros, jointGoalQueue } = state;
 
-      if (!ros) {
-          console.warn("ROS not connected — cannot process joint goal queue");
-          set({ jointGoalQueue: [], isProcessingJointQueue: false });
-          return;
+    if (!ros) {
+      console.warn("ROS not connected — cannot process joint goal queue");
+      set({ jointGoalQueue: [], isProcessingJointQueue: false });
+      return;
+    }
+
+    if (jointGoalQueue.length === 0) {
+      set({ isProcessingJointQueue: false });
+      return;
+    }
+
+    set({ isProcessingJointQueue: true });
+
+    // Fetch the next goal
+    const [nextTarget, ...rest] = jointGoalQueue;
+    set({ jointGoalQueue: rest });
+
+    // Fetch publisher, if it doesn't exist, add it.
+    let cmdPub = state.cmdJointPosPub;
+    if (!cmdPub) {
+      cmdPub = new ROSLIB.Topic({
+        ros,
+        name: "/gh360_control/cmd_joint_pos",
+        messageType: "std_msgs/msg/Float64MultiArray",
+      });
+      set({ cmdJointPosPub: cmdPub });
+    }
+    const target = nextTarget.slice();
+
+    const maxDurationMs = 30000; // total time allowed per goal (ms)
+    const intervalMs = 10; // send/check interval (ms)
+    const epsilon = 1; // “close enough” tolerance
+
+    const startTime = Date.now();
+
+    function loop() {
+      const { msgJointPositions } = get();
+
+      // Reached target?
+      if (isCloseEnough(target, msgJointPositions, epsilon)) {
+        // Proceed to next in queue
+        const { _processJointQueue } = get();
+        _processJointQueue();
+        return;
       }
 
-      if (jointGoalQueue.length === 0) {
-          set({ isProcessingJointQueue: false });
-          return;
+      // Timeout, send next in queue.
+      if (Date.now() - startTime > maxDurationMs) {
+        console.warn("Timeout sending joint command — did not reach target");
+        const { _processJointQueue } = get();
+        _processJointQueue();
+        return;
       }
 
-      set({ isProcessingJointQueue: true });
+      // Send one command
+      cmdPub.publish({ data: target });
 
-      // Fetch the next goal
-      const [nextTarget, ...rest] = jointGoalQueue;
-      set({ jointGoalQueue: rest });
+      // Schedule next check/send
+      setTimeout(loop, intervalMs);
+    }
 
-      // Fetch publisher, if it doesn't exist, add it.
-      let cmdPub = state.cmdJointPosPub;
-      if (!cmdPub) {
-          cmdPub = new ROSLIB.Topic({
-              ros,
-              name: "/gh360_control/cmd_joint_pos",
-              messageType: "std_msgs/msg/Float64MultiArray",
-          });
-          set({ cmdJointPosPub: cmdPub });
-      }
-      const target = nextTarget.slice();
-
-      const maxDurationMs = 30000;// total time allowed per goal (ms)
-      const intervalMs = 10;     // send/check interval (ms)
-      const epsilon = 1;       // “close enough” tolerance
-
-      const startTime = Date.now();
-
-      function loop() {
-          const { msgJointPositions } = get();
-
-          // Reached target?
-          if (isCloseEnough(target, msgJointPositions, epsilon)) {
-              // Proceed to next in queue
-              const { _processJointQueue } = get();
-              _processJointQueue();
-              return;
-          }
-
-          // Timeout, send next in queue.
-          if (Date.now() - startTime > maxDurationMs) {
-              console.warn("Timeout sending joint command — did not reach target");
-              const { _processJointQueue } = get();
-              _processJointQueue();
-              return;
-          }
-
-          // Send one command
-          cmdPub.publish({ data: target });
-
-          // Schedule next check/send
-          setTimeout(loop, intervalMs);
-      }
-
-      // Start this goal's loop
-      loop();
+    // Start this goal's loop
+    loop();
   },
 
   publishCmdJointPos: (positions) => {
-      const target = Array.isArray(positions) ? positions.slice() : [];
-      if (!target.length) return;
+    const target = Array.isArray(positions) ? positions.slice() : [];
+    if (!target.length) return;
 
-      // Push onto end of queue
-      set((state) => ({
-          jointGoalQueue: [...state.jointGoalQueue, target],
-      }));
+    // Push onto end of queue
+    set((state) => ({
+      jointGoalQueue: [...state.jointGoalQueue, target],
+    }));
 
-      // Start processing if not already
-      const { isProcessingJointQueue, _processJointQueue } = get();
-      if (!isProcessingJointQueue) {
-          _processJointQueue();
-      }
+    // Start processing if not already
+    const { isProcessingJointQueue, _processJointQueue } = get();
+    if (!isProcessingJointQueue) {
+      _processJointQueue();
+    }
   },
 
   subscribeToTopics: () => {

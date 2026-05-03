@@ -6,6 +6,7 @@ import {
   Code,
   LayoutDashboard,
   PanelLeftClose,
+  Plug,
   Power,
   RefreshCw,
 } from "lucide-react";
@@ -110,14 +111,22 @@ function Navbar({ setOpenNavbar }) {
               setTimeout(() => setReconnectCooldown(false), 1000);
             }}
             disabled={reconnectCooldown}
-            title="Reconnect"
+            title="Connect/Reconnect"
           >
-            <RefreshCw
-              color="#32d17a"
-              className={`sm:scale-75 md:scale-75 lg:scale-90 xl:scale-100 2xl:scale-125 ${
-                reconnectCooldown ? "animate-spin" : ""
-              }`}
-            />
+            {isConnected ? (
+              <RefreshCw
+                color="#32d17a"
+                className={`sm:scale-75 md:scale-75 lg:scale-90 xl:scale-100 2xl:scale-125 ${
+                  reconnectCooldown ? "animate-spin" : ""
+                }`}
+              />
+            ) : (
+              <Plug
+                strokeWidth={2.5}
+                color="#32d17a"
+                className="sm:scale-75 md:scale-75 lg:scale-90 xl:scale-100 2xl:scale-125 "
+              />
+            )}
           </Button>
 
           <Button

@@ -193,7 +193,7 @@ function MoveRobot() {
               />
               <Button
                 onClick={updateSavedPositions}
-                className="flex-1 sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer w-"
+                className="flex sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer w-"
                 title="Save position"
               >
                 Save position
@@ -204,7 +204,7 @@ function MoveRobot() {
               className="w-full sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
               title="Send positions"
             >
-              Send Goal
+              Move to position
             </Button>
           </div>
         </CardFooter>
