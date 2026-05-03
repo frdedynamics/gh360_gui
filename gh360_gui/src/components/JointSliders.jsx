@@ -2,6 +2,7 @@ import { Slider } from "@/components/ui/slider";
 import { JOINT_LIMITS, RAD_TO_DEG } from "@/configs/jointConfigs";
 
 function JointSliders({ jointName, value, angleUnit, onChange }) {
+  // Joint limit so sliders are confined inside the legitimate robot joint angles.
   const limits = JOINT_LIMITS[jointName];
   const isRad = angleUnit === "radians";
 

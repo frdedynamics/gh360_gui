@@ -72,18 +72,20 @@ function Model({ ghost }) {
       robotRef.current = robot;
       needsRenderRef.current = true;
     });
-      if (ghost) {
-          loader.load("/gh360-threejs-model/urdf/gh360_ghost.urdf", (ghostRobot) => {
-              // tiny scale to avoid z-fighting
-              ghostRobot.scale.set(1.0001, 1.0001, 1.0001);
-              scene.add(ghostRobot);
-              ghostRobotRef.current = ghostRobot;
-              needsRenderRef.current = true;
-          });
-      }
+    if (ghost) {
+      loader.load(
+        "/gh360-threejs-model/urdf/gh360_ghost.urdf",
+        (ghostRobot) => {
+          // tiny scale to avoid z-fighting
+          ghostRobot.scale.set(1.0001, 1.0001, 1.0001);
+          scene.add(ghostRobot);
+          ghostRobotRef.current = ghostRobot;
+          needsRenderRef.current = true;
+        },
+      );
+    }
 
-
-      const handleResize = () => {
+    const handleResize = () => {
       if (!mount) return;
       camera.aspect = mount.clientWidth / mount.clientHeight;
       camera.updateProjectionMatrix();
@@ -136,23 +138,23 @@ function Model({ ghost }) {
 
   // fires on ROS feedback
   useEffect(() => {
-  if (!msgJointPositions) return;
+    if (!msgJointPositions) return;
 
-  const targetRobot = ghost ? ghostRobotRef.current : robotRef.current;
-  if (!targetRobot) return;
+    const targetRobot = ghost ? ghostRobotRef.current : robotRef.current;
+    if (!targetRobot) return;
 
-  Object.entries(JOINT_MAP).forEach(([name, index]) => {
+    Object.entries(JOINT_MAP).forEach(([name, index]) => {
       const angle = msgJointPositions[index];
       if (angle === undefined) return;
       targetRobot.setJointValue(name, angle);
-  });
+    });
 
     // Render immediately — don't wait for the next RAF tick
     if (rendererRef.current && cameraRef.current && sceneRef.current) {
-        rendererRef.current.render(sceneRef.current, cameraRef.current);
+      rendererRef.current.render(sceneRef.current, cameraRef.current);
     }
     needsRenderRef.current = false;
-}, [msgJointPositions]);
+  }, [msgJointPositions]);
 
   return (
     <div className="flex justify-center h-full flex-col">

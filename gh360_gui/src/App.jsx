@@ -11,13 +11,16 @@ import { Toaster } from "react-hot-toast";
 function App() {
   const { connect } = useRosStore();
 
+  // Connecting when you first mount the application.
   useEffect(() => {
     connect();
   }, []);
 
   return (
     // Routing setup, with BrowserRouter.
+    // Themed saved in localStorage.
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+      {/* Toaster for popup notifications. */}
       <Toaster />
       <BrowserRouter>
         <Routes>

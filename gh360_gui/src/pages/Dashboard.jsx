@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { JOINT_CONFIG } from "@/configs/jointConfigs";
 import { Video, VideoOff } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useRosStore from "@/store/rosStore.js";
 
 function Dashboard() {
@@ -18,14 +18,19 @@ function Dashboard() {
   const publishCmdJointPos = useRosStore((s) => s.publishCmdJointPos);
 
   function runCode() {
-      console.log(code);
-      eval(code);
+    console.log(code);
+    eval(code);
   }
+  // Changes the tab name when it first mounts.
+  useEffect(() => {
+    document.title = "GH360 Dashboard";
+  }, []);
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] h-dvh w-full overflow-hidden">
       <div className="overflow-y-auto p-2 sm:p-3 md:p-3 lg:p-4 xl:p-4 2xl:p-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 md:gap-2 lg:gap-3 xl:gap-3 2xl:gap-4 sm:text-sm md:text-sm lg:text-base xl:text-base 2xl:text-xl">
+          {/* Card for setting the rad or deg. Can also play a set of positions from block-progamming. */}
           <Card className="w-full">
             <CardHeader className="font-semibold">
               <p className="underline decoration-2 underline-offset-4 sm:underline-offset-4 md:underline-offset-4 lg:underline-offset-6 xl:underline-offset-6 2xl:underline-offset-6 sm:text-base md:text-base lg:text-lg xl:text-xl 2xl:text-2xl">
@@ -67,11 +72,11 @@ function Dashboard() {
                 </div>
               </RadioGroup>
               <Button className={code ? "flex-1" : "hidden"} onClick={runCode}>
-                  Play saved code
+                Play saved code
               </Button>
             </CardContent>
           </Card>
-
+          {/* Displaying the different joints in each card.  */}
           {JOINT_CONFIG.map((joint) => (
             <JointCard
               key={joint.jointName}

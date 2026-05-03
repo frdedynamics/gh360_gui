@@ -10,11 +10,16 @@ import { Minus, Plus } from "lucide-react";
 import useRosStore from "@/store/rosStore";
 
 function JointCard({ jointName, index, motors, angleUnit }) {
+  //Boolean state that makes it possible to see motorstates if applicable
   const [moreInfo, setMoreInfo] = useState(false);
+
+  //Fetching the joint/motor topics from the rosStore when mounted.
   const jointPositions = useRosStore((s) => s.msgJointPositions);
   const motorStates = useRosStore((s) => s.motorStates);
 
   const jointAngle = jointPositions?.[index] ?? null;
+
+  //Memoization for optimizing re-rendering.
   const motorData = useMemo(() => {
     if (!motorStates) return null;
     return motors.map((i) => motorStates[i]);
@@ -23,6 +28,7 @@ function JointCard({ jointName, index, motors, angleUnit }) {
   return (
     <Card className="w-full h-full flex flex-col overflow-hidden min-h-24 sm:min-h-28 md:min-h-32 lg:min-h-36 xl:min-h-36 2xl:min-h-44">
       <CardHeader className="text-sm shrink-0 sm:text-base md:text-base lg:text-lg xl:text-2xl 2xl:text-3xl">
+        {/* Make sures that joint names are not divided by a "_", like "forarm_roll" */}
         <CardTitle>{jointName.replaceAll("_", " ")}</CardTitle>
         <CardAction>
           <button
@@ -63,6 +69,7 @@ function JointCard({ jointName, index, motors, angleUnit }) {
             </div>
           </div>
         )}
+        {/* Renders the motor data if moreInfo is true */}
         {moreInfo &&
           motorData?.map((motor, i) => (
             <div

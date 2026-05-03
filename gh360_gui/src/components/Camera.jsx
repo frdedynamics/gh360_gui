@@ -7,10 +7,13 @@ function Camera({ toggleCamera }) {
   const arucoRef = useRef(null);
   const isActiveRef = useRef(toggleCamera);
 
+  // Function that toggles the camera with a dependency array on toggleCaera.
+
   useEffect(() => {
     isActiveRef.current = toggleCamera;
   }, [toggleCamera]);
 
+  //custom hook that subscribes to the arucoMarkers topic.
   useRosTopic(
     "/door/aruco_markers",
     "ros2_aruco_interfaces/msg/ArucoMarkers",
@@ -19,7 +22,7 @@ function Camera({ toggleCamera }) {
       arucoRef.current = msg;
     },
   );
-
+  //Custom hook that subscribes to the cameraTopic.
   useRosTopic(
     "/camera/color/image_raw",
     "sensor_msgs/msg/Image",
