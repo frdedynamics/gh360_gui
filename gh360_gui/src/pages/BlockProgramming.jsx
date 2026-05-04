@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import * as Blockly from "blockly/core";
 import "blockly/blocks";
 import { javascriptGenerator } from "blockly/javascript";
-import * as En from "blockly/msg/en";
 import { Card } from "@/components/ui/card.jsx";
 import { lightBlocklyTheme, darkBlocklyTheme } from "../css/blocklyThemes.js";
 import "../components/CustomBlocklyBlocks.jsx";
@@ -10,7 +9,7 @@ import { Button } from "@/components/ui/button.jsx";
 import useRosStore from "@/store/rosStore.js";
 import toast from "react-hot-toast";
 
-Blockly.setLocale(En);
+const STORAGE_KEY = 'my_blockly_workspace';
 
 function BlockProgramming() {
   const blocklyDiv = useRef(null);
@@ -33,12 +32,13 @@ function BlockProgramming() {
       const dark = document.documentElement.classList.contains("dark");
       setIsDark(dark);
     };
-    sync(); // initial sync after mount
+    sync(); // sets the theme on load.
   }, []);
 
+  // function that saves the generated javascript code to the store.
   function saveCode() {
     setBlockCode(code);
-    save();
+    save(); //notification
   }
 
   useEffect(() => {
@@ -76,10 +76,21 @@ function BlockProgramming() {
       },
     });
 
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+        try {
+            const state = JSON.parse(stored);
+            Blockly.serialization.workspaces.load(state, workspace);
+        } catch (e) {
+            console.error('Failed to load workspace from storage', e);
+        }
+    }
+
     workspaceRef.current = workspace;
 
     const onChange = () => {
       setCode(javascriptGenerator.workspaceToCode(workspace));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(Blockly.serialization.workspaces.save(workspace)));
     };
     workspace.addChangeListener(onChange);
 
@@ -90,10 +101,8 @@ function BlockProgramming() {
       workspaceRef.current = null;
     };
   }, [isDark]);
-  useEffect(() => {
-    console.log(code);
-  }, [code]);
-  return (
+
+    return (
     <div className="w-full h-full">
       <Card className="flex flex-col overflow-hidden m-2 sm:m-2 md:m-2 lg:m-3 xl:m-3 2xl:m-4">
         <div

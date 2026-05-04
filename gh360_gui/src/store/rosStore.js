@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { persist } from 'zustand/middleware';
 import * as ROSLIB from "roslib";
 import toast from "react-hot-toast";
 
@@ -16,7 +17,7 @@ function isCloseEnough(target, current, epsilon) {
   return true;
 }
 
-const useRosStore = create((set, get) => ({
+const useRosStore = create(persist((set, get) => ({
   //Connection variables.
   ros: null,
   status: "disconnected",
@@ -258,6 +259,12 @@ const useRosStore = create((set, get) => ({
       get().connect();
     }
   },
+}), {
+    name: 'ros-store',
+    // only persist savedPositions
+    partialize: (state) => ({
+        savedPositions: state.savedPositions,
+    }),
 }));
 
 export default useRosStore;

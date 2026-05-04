@@ -1,14 +1,8 @@
 <?xml version="1.0"?>
 <robot name="multipleshapes">
 
-    <material name="red">
-        <color rgba="1.0 0 0 1"/>
-    </material>
-    <material name="white">
+    <material name="gray">
         <color rgba="1.0 1.0 1.0 1"/>
-    </material>
-    <material name="cyan">
-        <color rgba="0.0 0.3 0.9 1"/>
     </material>
 
     <link name="base_link" />
@@ -28,7 +22,7 @@
                 <mesh filename="package://gh360/meshes/360_shoulder_0.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <origin rpy="0 0 0" xyz="0 0 0"/>
-            <material name="white" />
+            <material name="gray" />
         </visual>
     </link>
 
@@ -46,7 +40,7 @@
                 <mesh filename="package://gh360/meshes/360_shoulder_1.stl"/>
             </geometry>
             <origin rpy="0 0 0" xyz="0 0 -0.176"/>
-            <material name="white" />
+            <material name="gray" />
         </visual>
     </link>
 
@@ -64,7 +58,7 @@
                 <mesh filename="package://gh360/meshes/360_shoulder_2.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <origin rpy="0 0 0" xyz="0 -0.160 -0.176"/>
-            <material name="cyan" />
+            <material name="gray" />
         </visual>
     </link>
 
@@ -82,7 +76,7 @@
                 <mesh filename="package://gh360/meshes/360_shoulder_3.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <origin rpy="0 0 0" xyz="0 -0.220 -0.347"/>
-            <material name="cyan" />
+            <material name="gray" />
         </visual>
     </link>
 
@@ -99,7 +93,7 @@
                 <mesh filename="package://gh360/meshes/360_upper_arm_0.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <origin rpy="0 0 0" xyz="0 -0.220 -0.347"/>
-            <material name="cyan" />
+            <material name="gray" />
         </visual>
     </link>
 
@@ -117,7 +111,7 @@
                 <mesh filename="package://gh360/meshes/360_upper_arm_1.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <origin rpy="0 0 0" xyz="-0.001 -0.113 -0.333"/>
-            <material name="cyan" />
+            <material name="gray" />
         </visual>
     </link>
 
@@ -135,7 +129,7 @@
                 <mesh filename="package://gh360/meshes/360_upper_arm_2.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <origin rpy="0 0 0" xyz="-0.001 0.055 -0.373"/>
-            <material name="white" />
+            <material name="gray" />
         </visual>
     </link>
 
@@ -152,7 +146,7 @@
                 <mesh filename="package://gh360/meshes/360_lower_arm_0.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <origin rpy="0 0 0" xyz="-0.001 0.055 -0.373"/>
-            <material name="cyan" />
+            <material name="gray" />
         </visual>
     </link>
 
@@ -170,7 +164,7 @@
                 <mesh filename="package://gh360/meshes/360_lower_arm_1.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <origin rpy="0 0 0" xyz="-0.001 0.129 -0.332"/>
-            <material name="cyan" />
+            <material name="gray" />
         </visual>
     </link>
 
@@ -188,7 +182,7 @@
                 <mesh filename="package://gh360/meshes/360_lower_arm_2.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <origin rpy="0 0 0" xyz="-0.001 0.298 -0.332"/>
-            <material name="white" />
+            <material name="gray" />
         </visual>
     </link>
 
@@ -205,7 +199,7 @@
                 <mesh filename="package://gh360/meshes/gripper_hook_binary.stl" scale="0.001 0.001 0.001"/>
             </geometry>
             <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
-            <material name="red" />
+            <material name="gray" />
         </visual>
     </link>
 
