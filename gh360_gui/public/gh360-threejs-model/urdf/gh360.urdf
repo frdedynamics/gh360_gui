@@ -5,10 +5,10 @@
         <color rgba="1.0 0 0 1"/>
     </material>
     <material name="white">
-            <color rgba="1.0 1.0 1.0 1"/>
+        <color rgba="1.0 1.0 1.0 1"/>
     </material>
     <material name="cyan">
-            <color rgba="0.0 0.3 0.9 1"/>
+        <color rgba="0.0 0.3 0.9 1"/>
     </material>
 
     <link name="base_link" />
@@ -177,7 +177,7 @@
     <joint name="wrist_pitch" type="revolute">
         <axis xyz="-1 0 0"/>
         <limit effort="1000.0" lower="-1.571" upper="1.571" velocity="0.5"/>
-        <origin rpy="0 3.125 0" xyz="0.0 -0.169 0.0"/>
+        <origin rpy="0 0 0" xyz="0.0 -0.169 0.0"/>
         <parent link="lowerarm1"/>
         <child link="lowerarm2"/>
     </joint>
@@ -204,7 +204,7 @@
             <geometry>
                 <mesh filename="package://gh360/meshes/gripper_hook_binary.stl" scale="0.001 0.001 0.001"/>
             </geometry>
-            <origin rpy="0 3.1415 0" xyz="0.0 0.0 0.0"/>
+            <origin rpy="0 0 0" xyz="0.0 0.0 0.0"/>
             <material name="red" />
         </visual>
     </link>

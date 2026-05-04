@@ -47,9 +47,7 @@ function BlockProgramming() {
     const toolbox = {
       kind: "flyoutToolbox",
       contents: [
-        { kind: "block", type: "controls_if" },
-        { kind: "block", type: "logic_compare" },
-        { kind: "block", type: "math_number", fields: { NUM: 1 } },
+          { kind: "block", type: "move_arm" },
         {
           kind: "block",
           type: "controls_for",
@@ -59,10 +57,6 @@ function BlockProgramming() {
             BY: { block: { type: "math_number", fields: { NUM: 1 } } },
           },
         },
-        { kind: "block", type: "text_print" },
-        { kind: "block", type: "variables_get" },
-        { kind: "block", type: "variables_set" },
-        { kind: "block", type: "move_arm" },
       ],
     };
 

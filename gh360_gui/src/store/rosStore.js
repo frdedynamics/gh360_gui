@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import * as ROSLIB from "roslib";
+import toast from "react-hot-toast";
 
 // Helper function for deciding if robot is close enough to its goal.
 function isCloseEnough(target, current, epsilon) {
@@ -11,6 +12,7 @@ function isCloseEnough(target, current, epsilon) {
       return false;
     }
   }
+  toast.success("Position reached!");
   return true;
 }
 
@@ -107,15 +109,16 @@ const useRosStore = create((set, get) => ({
 
     const maxDurationMs = 30000; // total time allowed per goal (ms)
     const intervalMs = 10; // send/check interval (ms)
-    const epsilon = 1; // “close enough” tolerance
+    const epsilon = 0.03; // “close enough” tolerance
 
     const startTime = Date.now();
 
-    function loop() {
+    function Messageloop() {
       const { msgJointPositions } = get();
 
       // Reached target?
       if (isCloseEnough(target, msgJointPositions, epsilon)) {
+
         // Proceed to next in queue
         const { _processJointQueue } = get();
         _processJointQueue();
@@ -134,11 +137,11 @@ const useRosStore = create((set, get) => ({
       cmdPub.publish({ data: target });
 
       // Schedule next check/send
-      setTimeout(loop, intervalMs);
+      setTimeout(Messageloop, intervalMs);
     }
 
     // Start this goal's loop
-    loop();
+    Messageloop();
   },
 
   publishCmdJointPos: (positions) => {

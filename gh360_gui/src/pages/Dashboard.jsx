@@ -14,7 +14,9 @@ function Dashboard() {
   const [toggleCamera, setToggleCamera] = useState(false);
   const [angleUnit, setAngleUnit] = useState("radians");
 
+  // Fetching the saved code from the block programming page stored in the store.
   const code = useRosStore((s) => s.blockCode);
+  // Needed in order for the block code to be able to run the function.
   const publishCmdJointPos = useRosStore((s) => s.publishCmdJointPos);
 
   function runCode() {

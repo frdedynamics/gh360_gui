@@ -44,6 +44,7 @@ function MoveRobot() {
   const setSavedPosition = useRosStore((s) => s.setSavedPosition);
   const savedPositions = useRosStore((s) => s.savedPositions);
   const msgJointPositions = useRosStore((s) => s.msgJointPositions);
+  const currentlyRunning = useRosStore((s) => s.isProcessingJointQueue);
 
   useEffect(() => {
     jointValuesRef.current = jointValues;
@@ -201,6 +202,7 @@ function MoveRobot() {
             </div>
             <Button
               onClick={enqueueSend}
+              disabled={currentlyRunning}
               className="w-full sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
               title="Send positions"
             >
