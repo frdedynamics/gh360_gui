@@ -20,7 +20,6 @@ function Dashboard() {
   const publishCmdJointPos = useRosStore((s) => s.publishCmdJointPos);
 
   function runCode() {
-    console.log(code);
     eval(code);
   }
   // Changes the tab name when it first mounts.

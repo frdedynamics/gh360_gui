@@ -280,6 +280,7 @@ const useRosStore = create(persist((set, get) => ({
     // only persist savedPositions
     partialize: (state) => ({
         savedPositions: state.savedPositions,
+        blockCode: state.blockCode,
     }),
 }));
 
