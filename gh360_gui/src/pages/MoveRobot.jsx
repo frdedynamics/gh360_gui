@@ -13,6 +13,7 @@ import useRosStore from "@/store/rosStore";
 import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import CustomInput from "../components/CustomInput";
+import {Power} from "lucide-react";
 
 // Cooldown for sending goal positions
 const SEND_COOLDOWN_MS = 6000;
@@ -45,6 +46,7 @@ function MoveRobot() {
   const savedPositions = useRosStore((s) => s.savedPositions);
   const msgJointPositions = useRosStore((s) => s.msgJointPositions);
   const currentlyRunning = useRosStore((s) => s.isProcessingJointQueue);
+  const setStop = useRosStore((s) => s.setStop);
 
   useEffect(() => {
     jointValuesRef.current = jointValues;
@@ -200,14 +202,29 @@ function MoveRobot() {
                 Save position
               </Button>
             </div>
-            <Button
-              onClick={enqueueSend}
-              disabled={currentlyRunning}
-              className="w-full sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
-              title="Send positions"
-            >
-              Move to position
-            </Button>
+            <div className="flex w-full gap-2">
+              <Button
+                onClick={enqueueSend}
+                disabled={currentlyRunning}
+                className="flex-1 sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
+                title="Send positions"
+              >
+                Move to position
+              </Button>
+              <Button
+                  className="flex-4"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setStop(true)}
+                  disabled={!currentlyRunning}
+                  title="Stop"
+              >
+                <Power
+                    className="sm:scale-75 md:scale-75 lg:scale-90 xl:scale-100 2xl:scale-125"
+                    color="#e00b24"
+                />
+              </Button>
+            </div>
           </div>
         </CardFooter>
       </Card>
