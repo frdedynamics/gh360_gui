@@ -128,6 +128,7 @@ function BlockProgramming() {
         <div className="flex w-full gap-2">
             <Button
               onClick={saveAndPlayCode}
+              disabled={currentlyRunning}
               className="flex-1 sm:text-xs md:text-xs lg:text-sm xl:text-sm 2xl:text-base cursor-pointer"
               title="Save and play"
             >
