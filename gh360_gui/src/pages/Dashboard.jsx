@@ -14,11 +14,13 @@ function Dashboard() {
   const [toggleCamera, setToggleCamera] = useState(false);
   const [angleUnit, setAngleUnit] = useState("radians");
 
+  // Fetching the saved code from the block programming page stored in the store.
   const code = useRosStore((s) => s.blockCode);
+  // Needed in order for the block code to be able to run the function.
   const publishCmdJointPos = useRosStore((s) => s.publishCmdJointPos);
 
+  // Runs the javascript code. eval is not usually recommended but works in this case since it is a local application.
   function runCode() {
-    console.log(code);
     eval(code);
   }
   // Changes the tab name when it first mounts.

@@ -15,6 +15,7 @@ const JOINT_MAP = {
   wrist_pitch: 6,
 };
 
+// Three.js model setup with optional 'ghost' paramater that creates another ghost robot if true.
 function Model({ ghost }) {
   const mountRef = useRef(null);
   const robotRef = useRef(null);
@@ -24,6 +25,7 @@ function Model({ ghost }) {
   const sceneRef = useRef(null);
   const needsRenderRef = useRef(true);
 
+  // Listens to both jointPositions (sliders in move robot page) and msgJointPositions (messages recieved from the robot).
   const jointPositions = useRosStore((s) => s.jointPositions);
   const msgJointPositions = useRosStore((s) => s.msgJointPositions);
 
@@ -34,6 +36,7 @@ function Model({ ghost }) {
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
+    // Camera setup.
     const camera = new THREE.PerspectiveCamera(
       75,
       mount.clientWidth / mount.clientHeight,
@@ -45,6 +48,7 @@ function Model({ ghost }) {
     camera.lookAt(0, -0.2, 0);
     cameraRef.current = camera;
 
+    // Renderer used to render the scene.
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setClearColor(0xffffff);
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -52,6 +56,7 @@ function Model({ ghost }) {
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
+    // Controls that allos the camera to orbit around a single point (roughly where the robot is).
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(0.2, 0, 0.15);
     controls.update();
@@ -59,12 +64,14 @@ function Model({ ghost }) {
       needsRenderRef.current = true;
     });
 
+    // 2 directional light sources. Can also use ambient light, but it has no shadows so it melts together.
     const light1 = new THREE.DirectionalLight(0xffffff, 1);
     const light2 = new THREE.DirectionalLight(0xffffff, 1);
     light1.position.set(1, 1, 1);
     light2.position.set(-1, -1, -1);
     scene.add(light1, light2);
 
+    // URDFLoader is needed to read the URDF file in order to set up the robot.
     const loader = new URDFLoader();
     loader.packages = { gh360: "/gh360-threejs-model" };
     loader.load("/gh360-threejs-model/urdf/gh360.urdf", (robot) => {
@@ -72,11 +79,11 @@ function Model({ ghost }) {
       robotRef.current = robot;
       needsRenderRef.current = true;
     });
-    if (ghost) {
+    if (ghost) { // if ghost = true, load a second ghost robot with the ghost urdf (only actually used in move robot page).
       loader.load(
         "/gh360-threejs-model/urdf/gh360_ghost.urdf",
         (ghostRobot) => {
-          // tiny scale to avoid z-fighting
+          // tiny scale to avoid z-fighting.
           ghostRobot.scale.set(1.0001, 1.0001, 1.0001);
           scene.add(ghostRobot);
           ghostRobotRef.current = ghostRobot;
@@ -85,6 +92,7 @@ function Model({ ghost }) {
       );
     }
 
+    // Method that fixes the look in case of resizing.
     const handleResize = () => {
       if (!mount) return;
       camera.aspect = mount.clientWidth / mount.clientHeight;
@@ -105,6 +113,7 @@ function Model({ ghost }) {
     };
     animate();
 
+    // Cleanup.
     return () => {
       cancelAnimationFrame(animFrameId);
       resizeObserver.disconnect();
@@ -136,7 +145,7 @@ function Model({ ghost }) {
     needsRenderRef.current = false;
   }, [jointPositions]);
 
-  // fires on ROS feedback
+  // fires on ROS feedback (message received)
   useEffect(() => {
     if (!msgJointPositions) return;
 

@@ -1,11 +1,13 @@
 import { Slider } from "@/components/ui/slider";
 import { JOINT_LIMITS, RAD_TO_DEG } from "@/configs/jointConfigs";
 
+// Custom sliders whose settings are based on the joint.
 function JointSliders({ jointName, value, angleUnit, onChange }) {
   // Joint limit so sliders are confined inside the legitimate robot joint angles.
   const limits = JOINT_LIMITS[jointName];
   const isRad = angleUnit === "radians";
 
+  // Set min/max and display value based on whether we're working with radians or degrees.
   const min = isRad ? limits.lower : limits.lowerdeg;
   const max = isRad ? limits.upper : limits.upperdeg;
   const displayValue = isRad ? value : RAD_TO_DEG(value);

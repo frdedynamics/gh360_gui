@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 function CustomInput({ savedPositions, nameInputRef }) {
   const [open, setOpen] = useState(false);
 
+  // Custom input field, lets the user easily write in names while also showing a list of the currently saved positions.
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
       <PopoverTrigger asChild>

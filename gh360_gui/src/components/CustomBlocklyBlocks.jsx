@@ -2,6 +2,7 @@ import {javascriptGenerator} from 'blockly/javascript';
 import * as Blockly from 'blockly';
 import useRosStore from "@/store/rosStore";
 
+// Method for fetching the saved positions from the rosStore, to be listed in the block.
 function getSavedPositionOptions() {
     const state = useRosStore.getState();
     const savedPositions = state.savedPositions || [];
@@ -13,6 +14,7 @@ function getSavedPositionOptions() {
     return savedPositions.map((item) => [item.name, item.name]);
 }
 
+// Custom move_arm block.
 Blockly.Blocks['move_arm'] = {
     init: function () {
         this.appendDummyInput()
@@ -29,6 +31,7 @@ Blockly.Blocks['move_arm'] = {
     },
 };
 
+// Generator for generating the javascript for the move_arm block.
 javascriptGenerator.forBlock['move_arm'] = function (block) {
     const posName = block.getFieldValue('SAVED_POS'); // selected name string
 

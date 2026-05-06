@@ -1,5 +1,7 @@
 import * as Blockly from 'blockly/core';
 
+
+// Light theme for if the page is in light mode
 export const lightBlocklyTheme = Blockly.Theme.defineTheme('lightTheme', {
     base: Blockly.Themes.Classic,
     blockStyles: {
@@ -27,6 +29,7 @@ export const lightBlocklyTheme = Blockly.Theme.defineTheme('lightTheme', {
     },
 });
 
+// Dark theme for if the page is in dark mode.
 export const darkBlocklyTheme = Blockly.Theme.defineTheme('darkTheme', {
     base: Blockly.Themes.Classic,
     blockStyles: {

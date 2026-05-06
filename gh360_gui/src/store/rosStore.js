@@ -1,5 +1,7 @@
 import { create } from "zustand";
+import { persist } from 'zustand/middleware';
 import * as ROSLIB from "roslib";
+import toast from "react-hot-toast";
 
 // Helper function for deciding if robot is close enough to its goal.
 function isCloseEnough(target, current, epsilon) {
@@ -11,10 +13,11 @@ function isCloseEnough(target, current, epsilon) {
       return false;
     }
   }
+  toast.success("Position reached!");
   return true;
 }
 
-const useRosStore = create((set, get) => ({
+const useRosStore = create(persist((set, get) => ({
   //Connection variables.
   ros: null,
   status: "disconnected",
@@ -46,10 +49,18 @@ const useRosStore = create((set, get) => ({
   jointGoalQueue: [],
   isProcessingJointQueue: false,
 
+  // Variable for when the user clicks the stop button.
+  stop: false,
+
+  // Sets stop to true, inteded for when stop button is pressed.
+  setStop: () => set({ stop: true }),
+
   // Setter for setting the code for block programming
   setBlockCode: (code) => set({ blockCode: code }),
+
   // Setter for setting the positions the sliders point to in MoveRobot.
   setJointPositions: (positions) => set({ jointPositions: positions }),
+
   // Setter for either updating the position of a stored item with a given name,
   // or adding a new item with the given name and position.
   setSavedPosition: (name, position) =>
@@ -107,15 +118,16 @@ const useRosStore = create((set, get) => ({
 
     const maxDurationMs = 30000; // total time allowed per goal (ms)
     const intervalMs = 10; // send/check interval (ms)
-    const epsilon = 1; // “close enough” tolerance
+    const epsilon = 0.03; // “close enough” tolerance
 
     const startTime = Date.now();
 
-    function loop() {
-      const { msgJointPositions } = get();
+    function MessageLoop() {
+      const { msgJointPositions, stop} = get();
 
       // Reached target?
       if (isCloseEnough(target, msgJointPositions, epsilon)) {
+
         // Proceed to next in queue
         const { _processJointQueue } = get();
         _processJointQueue();
@@ -130,15 +142,23 @@ const useRosStore = create((set, get) => ({
         return;
       }
 
+      // Checks if the user clicked the stop button
+      if(!stop) {
       // Send one command
       cmdPub.publish({ data: target });
 
       // Schedule next check/send
-      setTimeout(loop, intervalMs);
+        setTimeout(MessageLoop, intervalMs);
+      } else {
+          // Sends the current position to make sure the robot and model stay where they are.
+          cmdPub.publish({ data: msgJointPositions });
+          set({ stop: false, isProcessingJointQueue: false, jointGoalQueue: [] });
+          toast.error("Movement cancelled.");
+      }
     }
 
     // Start this goal's loop
-    loop();
+    MessageLoop();
   },
 
   publishCmdJointPos: (positions) => {
@@ -255,6 +275,13 @@ const useRosStore = create((set, get) => ({
       get().connect();
     }
   },
+}), {
+    name: 'ros-store',
+    // only persist savedPositions
+    partialize: (state) => ({
+        savedPositions: state.savedPositions,
+        blockCode: state.blockCode,
+    }),
 }));
 
 export default useRosStore;
