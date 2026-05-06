@@ -36,6 +36,7 @@ function JointCard({ jointName, index, motors, angleUnit }) {
             onClick={() => setMoreInfo((prev) => !prev)}
             disabled={motorData === null}
           >
+            {/* Check if moveInfo button, '+' was pressed or not. */}
             {!moreInfo ? (
               <Plus
                 className="hover:rotate-90 hover:duration-300 bg-muted rounded-2xl sm:scale-90 md:scale-90 lg:scale-100 xl:scale-110 2xl:scale-125"
@@ -51,11 +52,13 @@ function JointCard({ jointName, index, motors, angleUnit }) {
         </CardAction>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden">
+        {/* Check if there are recieved messages. */}
         {jointAngle === null ? (
           <p>Waiting for data...</p>
         ) : (
           <div className="pt-1 sm:pt-1 md:pt-2 lg:pt-2 xl:pt-2">
             <div className="text-xl sm:text-2xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl">
+              {/* Check if using radians or degrees, if degrees then convert to degrees. */}
               {angleUnit === "radians"
                 ? jointAngle.toFixed(2)
                 : (jointAngle * (180 / Math.PI)).toFixed(2)}
@@ -80,6 +83,7 @@ function JointCard({ jointName, index, motors, angleUnit }) {
               <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
                 Position:{motor.present_position.toFixed(2)}
                 <span className="opacity-50">
+                  {/* Check if using radians or degrees to decide text. */}
                   {angleUnit === "radians" ? (
                     <span>rad</span>
                   ) : (
@@ -89,6 +93,7 @@ function JointCard({ jointName, index, motors, angleUnit }) {
               </p>
               <p className="ml-2 sm:ml-2 md:ml-3 lg:ml-3 xl:ml-3">
                 Velocity:
+                {/* Check if using radians or degrees, if degrees then convert to degrees. Max 2 digits after ',' */}
                 {angleUnit === "radians"
                   ? motor.present_velocity.toFixed(2)
                   : (motor.present_velocity * (180 / Math.PI)).toFixed(2)}

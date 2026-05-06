@@ -69,8 +69,10 @@ function BlockProgramming() {
       ],
     };
 
+    // Picks theme based on if the application is in dark or light mode.
     const theme = isDark ? darkBlocklyTheme : lightBlocklyTheme;
 
+    // blockly workspace setup.
     const workspace = Blockly.inject(blocklyDiv.current, {
       toolbox,
       theme,
@@ -85,6 +87,8 @@ function BlockProgramming() {
       },
     });
 
+    // Checks if there is a stored workspace already and loads it if there is so progress doesn't get deleted when
+    // changing pages or refreshing.
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored) {
         try {
@@ -98,7 +102,9 @@ function BlockProgramming() {
     workspaceRef.current = workspace;
 
     const onChange = () => {
+      // When a change happens, generate javascript code from the workspace.
       setCode(javascriptGenerator.workspaceToCode(workspace));
+      // When a change happens, save the change to the storage.
       localStorage.setItem(STORAGE_KEY, JSON.stringify(Blockly.serialization.workspaces.save(workspace)));
     };
     workspace.addChangeListener(onChange);

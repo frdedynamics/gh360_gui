@@ -40,18 +40,24 @@ function MoveRobot() {
   const nameInputRef = useRef(null);
   const userTouchedSlidersRef = useRef(false);
 
+  // Imports functions from the rosStore.
   const publishCmdJointPos = useRosStore((s) => s.publishCmdJointPos);
   const setJointPositions = useRosStore((s) => s.setJointPositions);
   const setSavedPosition = useRosStore((s) => s.setSavedPosition);
+  const setStop = useRosStore((s) => s.setStop);
+
+  // Listens to changes to variables in the rosStore.
   const savedPositions = useRosStore((s) => s.savedPositions);
   const msgJointPositions = useRosStore((s) => s.msgJointPositions);
   const currentlyRunning = useRosStore((s) => s.isProcessingJointQueue);
-  const setStop = useRosStore((s) => s.setStop);
 
+
+  // Sets the reference variable whenever the real one changes.
   useEffect(() => {
     jointValuesRef.current = jointValues;
   }, [jointValues]);
 
+  // Sets title on the page.
   useEffect(() => {
     document.title = "GH360 Move Robot";
   }, []);
@@ -82,11 +88,13 @@ function MoveRobot() {
 
   function handleSliderChange(jointName, displayVal) {
     const isRad = angleUnit === "radians";
+    // val is stored as radians, so convert to radians if degrees.
     let val = isRad ? Number(displayVal) : DEG_TO_RAD(Number(displayVal));
     if (Number.isNaN(val)) return;
     userTouchedSlidersRef.current = true;
 
     const limits = JOINT_LIMITS[jointName];
+    // clamp val to limits if it exceeds them.
     val = Math.max(limits.lower, Math.min(limits.upper, val));
 
     setJointValues((prev) => {
@@ -101,10 +109,11 @@ function MoveRobot() {
     });
   }
 
+  // Updates the list of saved positions in the rosStore with a name and position.
   function updateSavedPositions() {
     const name = nameInputRef.current?.value.trim();
     if (!name) {
-      errorInput();
+      errorInput(); // Notification.
       return;
     }
 
@@ -112,10 +121,12 @@ function MoveRobot() {
     if (!position) {
       return;
     }
-    saved(name);
-    setSavedPosition(name, position);
+    saved(name); // Notification.
+    setSavedPosition(name, position); // adds a new item to the list if the name isn't used, replaces old one if it exists.
   }
 
+  // Method for sending messages to the rosStore with a cooldown. Now redundant since the send button is disabled while
+  // the robot moves.
   function sendNext() {
     const item = sendQueueRef.current.shift();
     if (!item) {
@@ -124,7 +135,7 @@ function MoveRobot() {
     }
     sendingRef.current = true;
 
-    // Publish as Float64MultiArray — just the flat position array
+    // Publish to the rosStore. Adds the position to a list that sends commands to the robot when available.
     publishCmdJointPos(item.position);
 
     cooldownTimerRef.current = window.setTimeout(() => {
@@ -145,9 +156,9 @@ function MoveRobot() {
         position: [...position],
         timeRequested: Date.now(),
       });
-      notify();
+      notify(); // notification.
     } else {
-      errorMsg();
+      errorMsg(); // notification.
     }
     if (!sendingRef.current) sendNext();
   }
@@ -229,7 +240,8 @@ function MoveRobot() {
         </CardFooter>
       </Card>
 
-      {/* Model side */}
+      {/* Model side, ghost=true to get 2 models: ghost that listens to received messages and normal model
+      that listens to sliders */}
       <div className="hidden sm:block p-2 sm:p-2 md:p-2 lg:p-3 xl:p-3 2xl:p-4 h-full overflow-hidden">
         <Model ghost={true} />
       </div>

@@ -19,6 +19,7 @@ function Dashboard() {
   // Needed in order for the block code to be able to run the function.
   const publishCmdJointPos = useRosStore((s) => s.publishCmdJointPos);
 
+  // Runs the javascript code. eval is not usually recommended but works in this case since it is a local application.
   function runCode() {
     eval(code);
   }
