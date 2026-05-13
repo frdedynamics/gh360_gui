@@ -59,7 +59,7 @@ function Model({ ghost }) {
     mount.appendChild(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Controls that allow the camera to orbit around a single point (roughly where the robot is).
+    // Controls that allows the camera to orbit around a single point (roughly where the robot is).
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.set(0.2, 0, 0.15);
     controls.update();
