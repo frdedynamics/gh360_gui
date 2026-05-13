@@ -3,7 +3,17 @@ import { persist } from 'zustand/middleware';
 import * as ROSLIB from "roslib";
 import toast from "react-hot-toast";
 
-// Helper function for deciding if robot is close enough to its goal.
+/**
+ * Helper function for deciding if robot is close enough to its goal.
+ * Calculates if a current position is close enough to the target position to be deemed acceptable
+ * based in epsilon value.
+ * @private
+ * @function isCloseEnough
+ * @param target a list of joint angles that the robot aims to move to.
+ * @param current a list of the current joint angles of the robot.
+ * @param epsilon a number determining chat is considered close enough to be acceptable.
+ * @returns {boolean} true if close enough, false otherwise.
+ */
 function isCloseEnough(target, current, epsilon) {
   if (!Array.isArray(target) || !Array.isArray(current)) return false;
   if (current.length !== target.length) return false;
@@ -17,6 +27,7 @@ function isCloseEnough(target, current, epsilon) {
   return true;
 }
 
+// Create sets up useRosStore, persist allows for saving data in local browser storage to persist between refreshes.
 const useRosStore = create(persist((set, get) => ({
   //Connection variables.
   ros: null,
@@ -52,7 +63,7 @@ const useRosStore = create(persist((set, get) => ({
   // Variable for when the user clicks the stop button.
   stop: false,
 
-  // Sets stop to true, inteded for when stop button is pressed.
+  // Sets stop to true, intended for when stop button is pressed.
   setStop: () => set({ stop: true }),
 
   // Setter for setting the code for block programming
@@ -83,21 +94,32 @@ const useRosStore = create(persist((set, get) => ({
       };
     }),
 
+    /**
+     * Function that processes robot movements by making sure they are completed in order and the next
+     * movement is only started after the last is either completed or has timed out after maxDurationMS runs out.
+     * Fetches or instantiates the publisher depending on if it exists, and starts a loop sending commands to move
+     * to the next position in the queue until the position is reached, it times out, or is manually stopped.
+     * @private
+     * @function _processJointQueue
+     */
   _processJointQueue: () => {
     const state = get();
     const { ros, jointGoalQueue } = state;
 
+    // If ros isn't available, sends a warning and empties the queue, sets isProcessingJointQueue to false and returns.
     if (!ros) {
       console.warn("ROS not connected — cannot process joint goal queue");
       set({ jointGoalQueue: [], isProcessingJointQueue: false });
       return;
     }
 
+    // If the queue is empty, sets isProcessingJointQueue to false and returns.
     if (jointGoalQueue.length === 0) {
       set({ isProcessingJointQueue: false });
       return;
     }
 
+    // jointGoalQueue is not empty, so start processing.
     set({ isProcessingJointQueue: true });
 
     // Fetch the next goal
@@ -161,6 +183,12 @@ const useRosStore = create(persist((set, get) => ({
     MessageLoop();
   },
 
+  /**
+   * Function that adds goal joint positions to the back of the jointGoalQueue and calls the function that processes
+   * the queue if it isn't running already.
+   * @function publicCmdJointPos
+   * @param positions Joint positions for the robot to move to.
+   */
   publishCmdJointPos: (positions) => {
     const target = Array.isArray(positions) ? positions.slice() : [];
     if (!target.length) return;
@@ -177,6 +205,11 @@ const useRosStore = create(persist((set, get) => ({
     }
   },
 
+  /**
+   * Function that instantiates two topics and sets jointMessage, msgJointPositions, motorMessage and motorStates to
+   * listen to them.
+   * @function subscribeToTopics
+   */
   subscribeToTopics: () => {
     const ros = get().ros;
     if (!ros) return;
@@ -208,6 +241,10 @@ const useRosStore = create(persist((set, get) => ({
     set({ jointTopic, motorTopic });
   },
 
+  /**
+   * Cleanup function
+   * @function unsubscribeFromTopics
+   */
   unsubscribeFromTopics: () => {
     const { jointTopic, motorTopic, jointPublisher, cmdJointPosPub } = get();
     jointTopic?.unsubscribe();
@@ -277,7 +314,7 @@ const useRosStore = create(persist((set, get) => ({
   },
 }), {
     name: 'ros-store',
-    // only persist savedPositions
+    // only persist savedPositions and blockCode.
     partialize: (state) => ({
         savedPositions: state.savedPositions,
         blockCode: state.blockCode,
