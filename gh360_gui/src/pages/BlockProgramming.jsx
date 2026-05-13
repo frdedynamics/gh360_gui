@@ -53,6 +53,7 @@ function BlockProgramming() {
   useEffect(() => {
     if (!blocklyDiv.current) return;
 
+    // Setup toolbox.
     const toolbox = {
       kind: "flyoutToolbox",
       contents: [

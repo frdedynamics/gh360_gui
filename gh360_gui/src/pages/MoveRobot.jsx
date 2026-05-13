@@ -18,21 +18,19 @@ import {Power} from "lucide-react";
 // Cooldown for sending goal positions
 const SEND_COOLDOWN_MS = 6000;
 
-// Notifications
-const notify = () => toast.success("Position sent");
-const saved = (name) => toast.success("Position saved with name: " + name);
-const errorMsg = () => toast.error("Too many inputs. Please wait.");
-const errorInput = () => toast.error("Please enter a name.");
-
 function MoveRobot() {
+  // Default start values for sliders (0).
   const initialJointValues = {
     name: JOINT_CONFIG.map((j) => j.jointName),
     position: JOINT_CONFIG.map(() => 0),
   };
 
+  // Keeps track of joint values in sliders.
   const [jointValues, setJointValues] = useState(initialJointValues);
+  // Keeps track of selected angle unit, default radians.
   const [angleUnit, setAngleUnit] = useState("radians");
 
+  // Pointers
   const jointValuesRef = useRef(initialJointValues);
   const sendQueueRef = useRef([]);
   const sendingRef = useRef(false);
@@ -51,7 +49,6 @@ function MoveRobot() {
   const msgJointPositions = useRosStore((s) => s.msgJointPositions);
   const currentlyRunning = useRosStore((s) => s.isProcessingJointQueue);
 
-
   // Sets the reference variable whenever the real one changes.
   useEffect(() => {
     jointValuesRef.current = jointValues;
@@ -62,7 +59,7 @@ function MoveRobot() {
     document.title = "GH360 Move Robot";
   }, []);
 
-  // Clear cooldown timer on unmount to avoid memory leaks
+  // Clear cooldown timer on unmount to avoid memory leaks.
   useEffect(() => {
     return () => {
       if (cooldownTimerRef.current) {
@@ -73,71 +70,74 @@ function MoveRobot() {
 
   useEffect(() => {
     if (!msgJointPositions || !msgJointPositions.length) return;
-    if (userTouchedSlidersRef.current) return;
+    if (userTouchedSlidersRef.current) return; // Don't mess with slider values if user is trying to move them.
 
+    // Change slider values when msgJointPositions updates.
     setJointValues((prev) => {
-      const nextPositions = [...msgJointPositions];
-      const next = { ...prev, position: nextPositions };
+      const nextPositions = [...msgJointPositions]; // Fetch joint value from the same joint in the message.
+      const next = { ...prev, position: nextPositions }; // Replace the joint value of the joint with the new value.
 
-      jointValuesRef.current = next;
-      setJointPositions(nextPositions); // keep store in sync (for Model)
+      jointValuesRef.current = next; // Update pointer.
+      setJointPositions(nextPositions); // keep store in sync (for Model).
 
-      return next;
+      return next; // return new jointValues.
     });
   }, [msgJointPositions, setJointPositions]);
+
 
   function handleSliderChange(jointName, displayVal) {
     const isRad = angleUnit === "radians";
     // val is stored as radians, so convert to radians if degrees.
     let val = isRad ? Number(displayVal) : DEG_TO_RAD(Number(displayVal));
     if (Number.isNaN(val)) return;
-    userTouchedSlidersRef.current = true;
+    userTouchedSlidersRef.current = true; // User touched the slider.
 
-    const limits = JOINT_LIMITS[jointName];
+    const limits = JOINT_LIMITS[jointName]; // Fetch limits for a given joint.
     // clamp val to limits if it exceeds them.
     val = Math.max(limits.lower, Math.min(limits.upper, val));
 
     setJointValues((prev) => {
-      const index = prev.name.indexOf(jointName);
+      const index = prev.name.indexOf(jointName); // Fetch index of current joint.
       if (index === -1) return prev;
-      const nextPositions = [...prev.position];
-      nextPositions[index] = val;
-      const next = { ...prev, position: nextPositions };
-      jointValuesRef.current = next;
-      setJointPositions(nextPositions);
-      return next;
+      const nextPositions = [...prev.position]; // Fetch old joint angles.
+      nextPositions[index] = val; // Update old joint angles to new ones.
+      const next = { ...prev, position: nextPositions }; // Shape next to { name: ..., position: ... } format.
+      jointValuesRef.current = next; // Update pointer.
+      setJointPositions(nextPositions); // Update rosStore.
+      return next; // Set jointValues.
     });
   }
 
   // Updates the list of saved positions in the rosStore with a name and position.
   function updateSavedPositions() {
-    const name = nameInputRef.current?.value.trim();
+    const name = nameInputRef.current?.value.trim(); // Fetch name from field and remove spaces at the edges.
     if (!name) {
-      errorInput(); // Notification.
+      toast.error("Please enter a name."); // Notification.
       return;
     }
 
-    const position = jointValuesRef.current;
+    const position = jointValuesRef.current; // Fetch slider joint values.
     if (!position) {
       return;
     }
-    saved(name); // Notification.
+    toast.success("Position saved with name: " + name); // Notification.
     setSavedPosition(name, position); // adds a new item to the list if the name isn't used, replaces old one if it exists.
   }
 
   // Method for sending messages to the rosStore with a cooldown. Now redundant since the send button is disabled while
   // the robot moves.
   function sendNext() {
-    const item = sendQueueRef.current.shift();
+    const item = sendQueueRef.current.shift(); // Take first item in the queue.
     if (!item) {
-      sendingRef.current = false;
+      sendingRef.current = false; // Stops sending if there is nothing to send.
       return;
     }
-    sendingRef.current = true;
+    sendingRef.current = true; // Starts sending.
 
     // Publish to the rosStore. Adds the position to a list that sends commands to the robot when available.
     publishCmdJointPos(item.position);
 
+    // Sets cooldown on window for sending next message (redundant now that button is disabled while robot is moving)
     cooldownTimerRef.current = window.setTimeout(() => {
       cooldownTimerRef.current = null;
       if (sendQueueRef.current.length > 0) {
@@ -148,6 +148,7 @@ function MoveRobot() {
     }, SEND_COOLDOWN_MS);
   }
 
+  // Function for adding a goal to the queue.
   function enqueueSend() {
     const { name, position } = jointValuesRef.current;
     if (sendQueueRef.current.length < 1) {
@@ -156,9 +157,9 @@ function MoveRobot() {
         position: [...position],
         timeRequested: Date.now(),
       });
-      notify(); // notification.
+      toast.success("Position sent"); // notification.
     } else {
-      errorMsg(); // notification.
+      toast.error("Too many inputs. Please wait."); // notification.
     }
     if (!sendingRef.current) sendNext();
   }
