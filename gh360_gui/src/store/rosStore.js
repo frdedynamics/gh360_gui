@@ -293,7 +293,7 @@ const useRosStore = create(persist((set, get) => ({
   },
 
   disconnect: () => {
-    set({ intentionalDisconnect: true });
+    set({ intentionalDisconnect: true, jointGoalQueue: [] });
     get().unsubscribeFromTopics();
     get().ros?.close();
   },
