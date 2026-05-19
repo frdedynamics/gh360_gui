@@ -34,6 +34,17 @@ npm i
 npm run dev
 ```
 
+## Connect to the GH360 robot
+### Installation
+- Add rosbridge_suite package version 1.3.1 in the ROS2 workspace. You can download it [here](https://github.com/RobotWebTools/rosbridge_suite/releases/tag/1.3.1).
+- Build the workspace.
+### Startup
+- Start the robot.
+- Launch the rosbridge server
+  ```
+  ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+  ```
+
 ## In order to run locally without a robot
 Clone the repository: https://github.com/LauEls/gh360_replay_environment
 and follow the instructions to set up the docker container in order to simulate the communication with the robot.
